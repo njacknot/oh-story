@@ -299,10 +299,11 @@ metadata:
 4. **资料研究**（按需）：如果写作中遇到需要查证的外部事实（历史年代、地理方位、职业细节等），spawn `story-researcher` agent 搜索并输出到 `参考资料/` 目录。研究完成后再继续写作。
 5. **写作**：如果项目已部署 narrative-writer agent（**必须先检查 `.claude/agents/narrative-writer.md` 是否存在**），spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：写正文\n章节：第{N}章\n细纲文件：大纲/细纲_第{N}章.md\n上一章：正文/第{N-1}章_*.md\n准备层输出：{3.1最简记忆包 + 3.2模块召回结果 + 3.3写作意图}\n情绪目标：{从准备层3.3确认}\n涉及角色：{从准备层3.1筛选}\n参考技法：{从准备层3.2召回}\n⚠️字数硬约束：本章必须达到细纲中设定的字数目标（{从细纲读取}字）。使用wc -m统计字数，不要用wc -c。字数未达标禁止结束本章。")` 执行正文写作，输出写入 `正文/第XXX章_章名.md`。如 narrative-writer agent 未部署，由主线程直接写作。
 6. **字数验证**（写作完成后的第一件事）：用 `wc -m`（或 `python3 -c "print(len(open('正文文件路径', encoding='utf-8').read()))"`）统计本章实际字数。如果字数 < 细纲目标的 90%，**回到细纲补充更多子事件/情节点**，然后用场景展开法将这些新子事件写成正文，直到字数达标后再进入步骤 7。禁止用堆砌感知层/反应层的方式凑字数。
-7. **检查**：章尾是否有钩子、爽点是否到位
+7. **基础检查**：章尾是否有钩子、爽点是否到位
 8. **禁用词扫描**：对照 `references/banned-words.md` 检查本章，一级词（高频AI腔）命中即替换；二级词（低频/语境相关）高频出现时替换，偶发可参考 `references/anti-ai-writing.md` 定性裁定
-9. **更新追踪**：写完后即时更新 `追踪/伏笔.md`（新增/回收伏笔）、`追踪/时间线.md`（记录事件时序）和 `追踪/角色状态.md`（如本章引起角色状态变化——身份、能力、关系、公众形象——则更新对应角色条目并追加变更记录）。角色状态更新规则详见 state-tracking.md。
-10. **中途快照**（长篇写作安全网）：每连续写完 3 章，在继续前执行以下快照操作：
+9. **单章主编复审**：如果项目已部署 chapter-editor agent（检查 `.claude/agents/chapter-editor.md` 是否存在），spawn `Agent(subagent_type: "chapter-editor", prompt: "项目目录：{dir}\n任务描述：单章复审\n章节：第{N}章\n正文文件：正文/第{N}章_*.md\n细纲文件：大纲/细纲_第{N}章.md\n上一章：正文/第{N-1}章_*.md\n追踪文件：追踪/伏笔.md, 追踪/时间线.md, 追踪/角色状态.md\n审查重点：细纲完成度+爽点释放+角色反应+节奏水分+AI味+连续性风险")` 执行复审。若 VERDICT 为 REVISE/REWRITE，主控汇总必须修改项，交由 narrative-writer 或主线程修订后回到步骤 6 重新验字数与复审。如 chapter-editor 未部署，由主线程按同一维度快速复审。
+10. **更新追踪**：写完后即时更新 `追踪/伏笔.md`（新增/回收伏笔）、`追踪/时间线.md`（记录事件时序）和 `追踪/角色状态.md`（如本章引起角色状态变化——身份、能力、关系、公众形象——则更新对应角色条目并追加变更记录）。角色状态更新规则详见 state-tracking.md。
+11. **中途快照**（长篇写作安全网）：每连续写完 3 章，在继续前执行以下快照操作：
    - 将当前进度写入 `追踪/上下文.md`（只更新进度元信息——当前位置、最近决策、待处理线索——不重复角色状态/伏笔的具体内容）
    - 用 `ls -la 正文/` 确认最近 3 个章节文件已成功写入磁盘且大小正常（>100 bytes）
    - 如果发现文件缺失或大小异常，立即重新写入
@@ -344,6 +345,10 @@ metadata:
 #### Agent 调用：consistency-checker
 
 质量检查阶段，如果项目已部署 consistency-checker agent（检查 `.claude/agents/consistency-checker.md` 是否存在），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 quality-checklist.md 直接检查。
+
+#### Agent 调用：chapter-editor（单章总复审）
+
+质量检查阶段，如果项目已部署 chapter-editor agent（检查 `.claude/agents/chapter-editor.md` 是否存在），spawn `Agent(subagent_type: "chapter-editor", prompt: "项目目录：{dir}\n任务描述：单章总复审\n检查范围：{本次写作的章节}\n检查类型：细纲完成度+读者体验+爽点释放+角色反应+节奏水分+连续性风险")` 获取 PASS/REVISE/REWRITE 报告。chapter-editor 不修改文件，只给主控和 narrative-writer 提供修订依据。
 
 #### Agent 调用：narrative-writer（去AI味审查）
 

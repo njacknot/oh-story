@@ -2,7 +2,7 @@
 name: story-setup
 version: 1.0.0
 description: |
-  网文写作工具集基础设施部署。将 hooks/rules/agents/CLAUDE.md 等基础设施部署到用户项目目录。
+  网文写作工具集基础设施部署。将本地 .oh-story-codex、AGENTS.md、hooks/rules/agents/CLAUDE.md 等基础设施部署到用户项目目录。
   触发方式：/story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」
 metadata:
   openclaw:
@@ -11,7 +11,7 @@ metadata:
 
 # story-setup：网文写作工具集基础设施部署
 
-你是写作基础设施部署器。将网文写作工具集的全套基础设施（hooks、rules、agents、CLAUDE.md）部署到用户项目目录。
+你是写作基础设施部署器。将网文写作工具集的全套基础设施（本地 `.oh-story-codex/`、`AGENTS.md`、hooks、rules、agents、CLAUDE.md）部署到用户项目目录。
 
 **执行铁律：不覆盖用户已有配置，合并而非替换。**
 
@@ -30,50 +30,79 @@ metadata:
 4. 检查 `.active-book` 文件是否存在
    - 存在 → 显示当前活跃书目
    - 不存在 → 跳过
+5. 检查 `.oh-story-codex/` 是否存在
+   - 存在 → 显示本地化 skill 包已部署
+   - 不存在 → 后续从当前 oh-story-codex skill 包复制
+6. 检查 `AGENTS.md` 是否存在
+   - 存在 → 后续按「AGENTS.md 合并策略」处理
+   - 不存在 → 后续创建新文件
 
 ## Phase 2：部署基础设施
 
 使用 AskUserQuestion 确认部署位置后，依次执行：
 
-### 2.1 部署 CLAUDE.md
+### 2.1 部署项目化 Skill 包
+
+- 优先运行脚本：
+  `skills/story-setup/scripts/deploy-projectized.sh <用户项目根目录> <当前 oh-story-codex 包根目录>`
+- 定位当前 oh-story-codex 包根目录：从 `skills/story-setup/SKILL.md` 向上两级找到包含 `skills/`、`README.md` 的目录
+- 复制整个包到用户项目根目录 `.oh-story-codex/`
+- 复制时排除 `.git/`、`.DS_Store`、`node_modules/`、临时文件和用户项目正文目录
+- 如果 `.oh-story-codex/` 已存在：
+  - 默认增量覆盖 skill 包自身文件
+  - 不删除用户在 `.oh-story-codex/` 下额外添加的文件
+  - 如用户明确要求干净重装，才先备份再替换
+- 目的：让 Trae SOLO、Cloud Agents、Codex/Claude 等不支持全局 skill 安装的运行环境也能读取项目内置 skill
+
+### 2.2 部署 AGENTS.md
+
+- 如果 2.1 已运行 `deploy-projectized.sh`，AGENTS.md 已由脚本创建或合并，本步骤只需验证
+- 读取 `skills/story-setup/references/templates/AGENTS.md.tmpl`
+- 替换占位符
+- 写入项目根目录 `AGENTS.md`（如已存在，按「AGENTS.md 合并策略」处理）
+- `AGENTS.md` 负责约束 Trae SOLO 或其他 Cloud Agents：优先读取 `.oh-story-codex/`，按本地 skill 工作流执行
+
+### 2.3 部署 CLAUDE.md
 - 读取 `skills/story-setup/references/templates/CLAUDE.md.tmpl`
 - 替换占位符（见下方「模板占位符」段）
 - 写入项目根目录 `CLAUDE.md`（如已存在，按「CLAUDE.md 合并策略」处理）
 
-### 2.2 部署 Hooks
+### 2.4 部署 Hooks
 - 读取 `skills/story-setup/references/templates/hooks/` 下所有 `.sh` 文件
 - 复制到用户项目的 `.claude/hooks/` 目录
 - 确保脚本有执行权限（chmod +x）
 
-### 2.3 部署 Rules
+### 2.5 部署 Rules
 - 读取 `skills/story-setup/references/templates/rules/` 下所有 `.md` 文件
 - 复制到用户项目的 `.claude/rules/` 目录
 
-### 2.4 部署 Agents
+### 2.6 部署 Agents
 - 读取 `skills/story-setup/references/templates/agents/` 下所有 `.md` 文件
 - 复制到用户项目的 `.claude/agents/` 目录
 
-### 2.5 部署 Session State 模板
+### 2.7 部署 Session State 模板
 - 读取 `skills/story-setup/references/templates/上下文.md.tmpl`
 - 如有书名目录，复制到 `{书名}/追踪/` 下
 
-### 2.6 合并 Hooks 注册到 settings.local.json
+### 2.8 合并 Hooks 注册到 settings.local.json
 - 读取 `skills/story-setup/references/templates/settings-hooks.json`
 - 读取用户项目的 `.claude/settings.local.json`（如存在）
 - 合并 hooks 配置（按「settings-hooks.json 合并算法」处理）
 - 写入 `.claude/settings.local.json`
 
-### 2.7 创建部署标记
+### 2.9 创建部署标记
 
 - 创建 `.story-deployed` 文件（sentinel file）
 - 写入以下字段：
   ```
   deployed_at: <date -u +"%Y-%m-%dT%H:%M:%SZ">
-  agents_version: 4
+  agents_version: 5
+  projectized_skill_version: 1
   setup_skill_version: 1.0.0
   ```
 - 此文件供 session-start.sh 和写作 skill 检测部署状态，避免重复提示
-- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 4，提示用户重新运行 story-setup 以更新 Agent（v4 新增 chapter-extractor 章节提取 agent）
+- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 5，提示用户重新运行 story-setup 以更新 Agent（v5 新增 chapter-editor 单章主编 agent）
+- 如果 `.story-deployed` 已存在但无 `projectized_skill_version`，提示用户重新运行 story-setup 以部署 `.oh-story-codex/` 和 `AGENTS.md`
 
 ## Phase 3：验证安装
 
@@ -84,9 +113,12 @@ metadata:
    - 检查 `.claude/rules/` 下的规则文件是否存在且包含 `paths` frontmatter
 3. 验证 agents：
    - 检查 `.claude/agents/` 下的 agent 定义文件是否存在
-4. 验证部署标记：
+4. 验证项目化 skill：
+   - 检查 `.oh-story-codex/skills/story/SKILL.md` 是否存在
+   - 检查 `AGENTS.md` 是否存在且包含 `OH-STORY-CODEX:BEGIN`
+5. 验证部署标记：
    - 检查 `.story-deployed` 是否存在且包含时间戳
-5. 输出安装报告：
+6. 输出安装报告：
    - 列出所有已部署的文件
    - 列出需要注意的事项（如已有配置已合并）
    - 提示用户可以开始使用 `/story-long-write` 或 `/story-short-write`
@@ -113,6 +145,14 @@ metadata:
 4. 用户独有的 section（自定义内容）**保留**不动
 5. 未知冲突用 AskUserQuestion 让用户选择保留哪个版本
 
+## AGENTS.md 合并策略
+
+用户已有 AGENTS.md 时，按托管区块合并：
+1. 读取用户现有 AGENTS.md
+2. 如果存在 `<!-- OH-STORY-CODEX:BEGIN -->` 与 `<!-- OH-STORY-CODEX:END -->`，用模板生成的新区块替换旧区块
+3. 如果不存在托管区块，将模板内容追加到文件末尾，并保留用户原有内容
+4. 用户在托管区块外的内容完整保留
+
 ## settings-hooks.json 合并算法
 
 hooks 注册合并按 command 字段去重：
@@ -127,8 +167,9 @@ hooks 注册合并按 command 字段去重：
 ## 重新部署
 
 - `.story-deployed` 不存在 → 全新安装，Phase 2 全部执行
-- `.story-deployed` 存在且 `agents_version: 4` → 提示已部署，AskUserQuestion 确认是否重新部署
-- `.story-deployed` 存在但 `agents_version` < 4 → 提示需要更新，重新执行 Phase 2 覆盖 agents/hooks/rules，CLAUDE.md 和 settings.local.json 走合并策略
+- `.story-deployed` 存在且 `agents_version: 5` 且 `projectized_skill_version: 1` → 提示已部署，AskUserQuestion 确认是否重新部署
+- `.story-deployed` 存在但 `agents_version` < 5 → 提示需要更新，重新执行 Phase 2 覆盖 agents/hooks/rules，CLAUDE.md、AGENTS.md 和 settings.local.json 走合并策略
+- `.story-deployed` 存在但没有 `projectized_skill_version` → 提示需要补充项目化部署，执行 2.1、2.2、2.9，并验证 `.oh-story-codex/` 与 `AGENTS.md`
 
 ---
 
@@ -137,9 +178,10 @@ hooks 注册合并按 command 字段去重：
 | 文件 | 用途 |
 |------|------|
 | references/templates/CLAUDE.md.tmpl | 项目根 CLAUDE.md 模板 |
+| references/templates/AGENTS.md.tmpl | 项目根 AGENTS.md 模板，约束 Trae SOLO / Cloud Agents 使用 `.oh-story-codex/` |
+| scripts/deploy-projectized.sh | 复制 `.oh-story-codex/` 并创建/合并 `AGENTS.md` |
 | references/templates/hooks/ | 6 个 hook 脚本模板 |
 | references/templates/rules/ | 4 条 path-scoped 规则模板 |
-| references/templates/agents/ | 7 个 agent 定义模板（story-architect, character-designer, narrative-writer, consistency-checker, story-researcher, story-explorer, chapter-extractor） |
+| references/templates/agents/ | 8 个 agent 定义模板（story-architect, character-designer, narrative-writer, chapter-editor, consistency-checker, story-researcher, story-explorer, chapter-extractor） |
 | references/templates/settings-hooks.json | hooks 注册 JSON 片段 |
 | references/templates/上下文.md.tmpl | 写作上下文模板 |
-

@@ -1,0 +1,78 @@
+<!-- OH-STORY-CODEX:BEGIN -->
+
+# {项目名} — Agent 协作规则
+
+本项目使用本地化的 oh-story-codex 写作工具集。所有 AI Agent、Trae SOLO 子代理、Cloud Agent、Codex/Claude 类助手在处理网文写作任务时，必须优先读取项目根目录的 `.oh-story-codex/`，不要依赖全局已安装 skill。
+
+## 本地 Skill 入口
+
+- 工具集根目录：`.oh-story-codex/`
+- 路由 skill：`.oh-story-codex/skills/story/SKILL.md`
+- 长篇写作：`.oh-story-codex/skills/story-long-write/SKILL.md`
+- 短篇写作：`.oh-story-codex/skills/story-short-write/SKILL.md`
+- 多视角审查：`.oh-story-codex/skills/story-review/SKILL.md`
+- 去 AI 味：`.oh-story-codex/skills/story-deslop/SKILL.md`
+- 项目部署：`.oh-story-codex/skills/story-setup/SKILL.md`
+
+读取规则：
+1. 先读对应 `SKILL.md`，再按需读取其 `references/` 文件。
+2. 不要一次性加载全部 references。
+3. 本地 `.oh-story-codex/` 与根目录 `AGENTS.md` 的规则优先于全局 skill。
+
+## 项目文件结构
+
+- `拆文库/`：拆文分析结果
+- `{书名}/设定/`：世界观、角色、势力、关系、题材定位
+- `{书名}/大纲/`：全书大纲、卷纲、细纲
+- `{书名}/正文/`：正文章节
+- `{书名}/追踪/`：上下文、伏笔、时间线、角色状态
+- `{书名}/对标/`：对标作品数据
+- `.active-book`：当前活跃书目相对路径
+
+如果 `.active-book` 存在，所有写作、审查、查询任务默认作用于该书目。
+
+## Trae SOLO 4 子代理映射
+
+如果运行环境支持 4 个子代理，使用以下固定分工：
+
+| SOLO 子代理 | 对应本地能力 | 职责 |
+|---|---|---|
+| Story Architect | `story-architect` | 题材定位、大纲、细纲、爽点、钩子、反转、结构审查 |
+| Character Director | `character-designer` | 角色档案、关系、动机、对话风格、OOC 检查 |
+| Narrative Writer | `narrative-writer` | 正文写作、场景展开、去 AI 味、格式合规 |
+| Chapter Editor | `chapter-editor` + 必要的连续性检查 | 单章复审、读者体验、细纲完成度、爽点释放、伏笔/时间线风险提示 |
+
+主控 Agent 负责调度和最终裁决。子代理不得互相递归调用，也不得同时改同一正文文件。
+
+## 单章写作闭环
+
+写单章时必须按以下顺序：
+
+1. 读取本章细纲；缺失则先补细纲。
+2. 读取上一章、角色状态、伏笔、时间线和必要设定。
+3. Story Architect 确认本章写作意图和目标情绪。
+4. Character Director 确认涉及角色状态和对话边界。
+5. Narrative Writer 写正文。
+6. 用 `wc -m` 或等价方式验证字数；不足目标 90% 则扩写后重验。
+7. Chapter Editor 做单章复审。
+8. 如复审为 REVISE/REWRITE，由主控汇总问题并交 Narrative Writer 修订。
+9. 更新 `追踪/伏笔.md`、`追踪/时间线.md`、`追踪/角色状态.md`、`追踪/上下文.md`。
+
+不要让多个子代理同时写同一章。正确模式是：单写手统一文风，多审查代理降低错误率。
+
+## 审查原则
+
+- 审查是找问题，不是证明正确。
+- 保留子代理分歧，主控不要自动和稀泥。
+- 修改优先级：硬冲突 > 细纲未完成 > 爽点失效 > OOC > AI 味 > 质感优化。
+- 任何改动正文的代理必须在修改后重新检查字数、钩子、爽点和追踪更新。
+
+## 禁止事项
+
+- 不要绕过 `.oh-story-codex/` 直接凭记忆执行写作流程。
+- 不要把正文堆在对话里，必须写入 `正文/` 文件。
+- 不要在字数未达标时声明章节完成。
+- 不要只写「众人震惊」「倒吸凉气」这类模板化爽点反应。
+- 不要修改用户未要求修改的旧章节，除非复审发现必须回炉且用户确认。
+
+<!-- OH-STORY-CODEX:END -->
