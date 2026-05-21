@@ -31,18 +31,50 @@
 
 如果 `.active-book` 存在，所有写作、审查、查询任务默认作用于该书目。
 
-## Trae SOLO 4 子代理映射
+## Trae SOLO 自定义子代理映射
 
-如果运行环境支持 4 个子代理，使用以下固定分工：
+Trae SOLO 的子代理需要在 Trae 的 Agent / SOLO Coder 配置入口中创建、导入或勾选为 SOLO Coder 可调用的自定义智能体。`AGENTS.md` 只能提供项目规则和角色说明，不能自动注册 Trae 自定义智能体。
 
-| SOLO 子代理 | 对应本地能力 | 职责 |
+如果当前 Trae SOLO 工作流只配置 4 个写作子代理，使用以下推荐分工：
+
+| 建议自定义智能体 | 对应本地能力 | 职责 |
 |---|---|---|
 | Story Architect | `story-architect` | 题材定位、大纲、细纲、爽点、钩子、反转、结构审查 |
 | Character Director | `character-designer` | 角色档案、关系、动机、对话风格、OOC 检查 |
 | Narrative Writer | `narrative-writer` | 正文写作、场景展开、去 AI 味、格式合规 |
 | Chapter Editor | `chapter-editor` + 必要的连续性检查 | 单章复审、读者体验、细纲完成度、爽点释放、伏笔/时间线风险提示 |
 
-主控 Agent 负责调度和最终裁决。子代理不得互相递归调用，也不得同时改同一正文文件。
+SOLO Coder / 主控 Agent 负责调度和最终裁决。自定义子代理之间不得互相调用，也不得同时改同一正文文件。需要更多能力时，优先把 `consistency-checker`、`story-researcher`、`story-explorer`、`chapter-extractor` 作为可选自定义智能体补充，而不是挤占上面 4 个核心写作席位。
+
+## Codex 原生子代理
+
+如果运行环境是 Codex，优先使用项目内的原生配置：
+
+- 子代理配置：`.codex/agents/*.toml`
+- 并发配置：`.codex/config.toml`
+- 推荐并发上限：`max_threads = 4`
+- 推荐递归深度：`max_depth = 1`
+
+Codex 默认只在用户明确要求时启动子代理。执行复杂写作任务时，主控应明确说明要调用哪些 agent，例如：
+
+- 开书/大纲：调用 `story-architect`
+- 人设/对话/OOC：调用 `character-designer`
+- 正文执行：调用 `narrative-writer`
+- 单章复审：调用 `chapter-editor`
+- 连续性审查：调用 `consistency-checker`
+- 资料查证：调用 `story-researcher`
+- 上下文查询：调用 `story-explorer`
+- 拆文提取：调用 `chapter-extractor`
+
+Codex 子代理同样遵守：不递归调用、不并发写同一章、写正文后必须字数验证和追踪更新。
+
+## 向下兼容规则
+
+- 不支持 `.codex/agents/*.toml` 的运行环境，忽略 Codex 原生子代理配置，继续按本文件的通用 `AGENTS.md` 规则执行。
+- 不支持子代理的运行环境，由主控 Agent 按「单章写作闭环」顺序串行完成对应检查，不得因为缺少子代理而跳过细纲、字数、复审和追踪更新。
+- 只配置 4 个子代理的运行环境，使用「Trae SOLO 自定义子代理映射」；其余能力由主控 Agent 串行承担。
+- 只支持 Claude `.claude/agents/*.md` 的运行环境，使用 `.claude/agents/`；只支持 Codex `.codex/agents/*.toml` 的运行环境，使用 `.codex/agents/`。
+- 任何运行环境都必须优先读取 `.oh-story-codex/skills/story/SKILL.md`；平台专属 agent 配置只是调度增强，不是执行前置条件。
 
 ## 单章写作闭环
 

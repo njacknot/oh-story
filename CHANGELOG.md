@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-> fork local：项目化部署 + 单章主编复审
+> fork local：项目化部署 + 单章主编复审 + Codex 原生子代理
 
-- **story-setup**：本 fork 将部署标记升级为 `agents_version` v8，并保留 upstream v0.6.6 的日更续写稳定性与伏笔 hook 降噪。
+- **story-setup**：本 fork 将部署标记升级为 `agents_version` v9，并保留 upstream v0.6.6 的日更续写稳定性与伏笔 hook 降噪。
 - **项目化 skill**：`/story-setup` 同步部署 `.oh-story-codex/` 与 `AGENTS.md`，便于 Trae SOLO / Cloud Agents 在项目内读取本地 skill。
 - **story-long-write**：单章写作与日更流程在禁用词扫描后支持 `chapter-editor` 复审，REVISE/REWRITE 时修订后重新验字数。
+- **Codex 子代理**：新增 `.codex/agents/*.toml` 与 `.codex/config.toml` 模板，`deploy-projectized.sh` 会同步部署 8 个 Codex 原生 story agent。
 
 ## v0.6.6
 

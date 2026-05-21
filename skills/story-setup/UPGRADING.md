@@ -18,6 +18,7 @@
 - `.claude/hooks/` — 所有 hook 脚本
 - `.claude/agents/` — 所有 agent 定义
 - `.claude/rules/` — 所有 path-scoped 规则
+- `.codex/agents/` — 所有 Codex 原生 agent TOML 定义
 - `.oh-story-codex/` — 项目内置 skill 包（用于 Trae SOLO / Cloud Agents）
 
 ### 需合并（不覆盖）
@@ -26,6 +27,7 @@
 - `CLAUDE.md` — 按 section 合并，用户独有 section 保留
 - `AGENTS.md` — 按 `OH-STORY-CODEX` 托管区块合并，用户区块保留
 - `.claude/settings.local.json` — hooks 按 command 去重 append，其他配置保留
+- `.codex/config.toml` — 只补充缺失的 `[agents]` 并发/深度配置，用户已有值保留
 
 ### 不碰
 
@@ -45,7 +47,8 @@
 - `agents_version: 5` → 旧版，需重新部署以统一短篇主会话/子代理正文格式
 - `agents_version: 6` → 旧版，需重新部署以获取日更续写与伏笔 hook 修复
 - `agents_version: 7` → 旧版，需重新部署以获取项目化 skill 包与 chapter-editor 单章复审
-- `agents_version: 8` + `projectized_skill_version: 1` → 当前版本
+- `agents_version: 8` + `projectized_skill_version: 1` → 旧版，需重新部署以获取 Codex 原生子代理配置
+- `agents_version: 9` + `projectized_skill_version: 2` + `codex_agents_version: 1` → 当前版本
 
 ## 版本变更
 
@@ -84,7 +87,7 @@
 - 修复 `detect-story-gaps.sh` 对伏笔表头和正常开放伏笔（`未埋`/`已埋`）的误报；SessionStart 只提示 `已过期` 或异常状态。
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/hooks/`、`.claude/agents/`、`.claude/rules/` 并获得新版 hook 行为。
 
-### v8 (当前)
+### v8
 
 - 新增 chapter-editor 单章主编 Agent
 - story-long-write 单章写作在字数验证、基础检查、禁用词扫描后执行 chapter-editor 复审
@@ -92,3 +95,10 @@
 - story-setup 新增项目化部署：复制 oh-story-codex 到项目根 `.oh-story-codex/`，并生成/合并 `AGENTS.md`
 - 新增 `scripts/deploy-projectized.sh`，用于稳定执行 `.oh-story-codex/` 复制和 `AGENTS.md` 托管区块合并
 - Trae SOLO / Cloud Agents 可通过 `AGENTS.md` 使用项目内置 skill，不依赖全局 skill 安装
+
+### v9 (当前)
+
+- 新增 Codex 原生 `.codex/agents/*.toml` 模板，覆盖 8 个 story agent：story-architect、character-designer、narrative-writer、chapter-editor、consistency-checker、story-researcher、story-explorer、chapter-extractor
+- 新增 `.codex/config.toml` 基础配置，默认 `max_threads = 4`、`max_depth = 1`
+- `deploy-projectized.sh` 在部署 `.oh-story-codex/` 与 `AGENTS.md` 时同步部署 `.codex/agents/`，并安全合并 `.codex/config.toml`
+- `AGENTS.md` 增加 Codex 原生子代理调用规则，明确 Codex 需要显式要求 spawn 子代理

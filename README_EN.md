@@ -163,11 +163,16 @@ Agents load writing theory from `references/` on demand (character design, dialo
 
 Executable helper: `skills/story-setup/scripts/deploy-projectized.sh <project-root> [oh-story-codex-root]`.
 
+Codex-native setup also deploys:
+
+- `.codex/config.toml`: subagent concurrency and nesting defaults.
+- `.codex/agents/*.toml`: 8 Codex-native story agents using the same names as the Claude agents.
+
 ## Upgrading to v0.6.6
 
 If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack.
 
-This release bumps `agents_version` to v8 and focuses on reducing token blow-ups in 40+ chapter daily long-form writing projects, while adding projectized skill deployment and chapter-editor review:
+This release bumps `agents_version` to v9 and focuses on reducing token blow-ups in 40+ chapter daily long-form writing projects, while adding projectized skill deployment, chapter-editor review, and Codex-native subagents:
 
 - After `/story-long-write 日更` enters the daily batch flow, same-batch “continue / rewrite / daily write” requests stay inside `workflow-daily.md` instead of jumping directly to prose writing.
 - Before each chapter, the workflow must read concrete project files from the current run: chapter outline, previous chapter prose, `追踪/上下文.md`, `追踪/伏笔.md`, `追踪/时间线.md`, and character status/settings.
@@ -175,6 +180,7 @@ This release bumps `agents_version` to v8 and focuses on reducing token blow-ups
 - Daily writing only handles incremental foreshadowing changes for the current batch; run `/story-review` explicitly when you need a full audit.
 - `/story-setup` deploys `.oh-story-codex/` and `AGENTS.md` so Trae SOLO / Cloud Agents can use the local skill pack from the project itself.
 - Long-form single-chapter and daily workflows can call `chapter-editor` for review, then revise and re-count when the verdict is REVISE/REWRITE.
+- Codex projects receive `.codex/agents/*.toml` and `.codex/config.toml`, enabling native subagents such as `story-architect`, `narrative-writer`, and `chapter-editor`.
 
 ## Automation Hooks
 
