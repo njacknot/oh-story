@@ -1,4 +1,4 @@
-<!-- Last synced with README.md: 2026-05-13 -->
+<!-- Last synced with README.md: 2026-05-21 -->
 
 **English** | [中文](README.md)
 
@@ -142,19 +142,39 @@ demo/拆文库-盘龙/
 
 ## Agent System
 
-Writing skills internally coordinate 7 specialized agents:
+Writing skills internally coordinate 8 specialized agents:
 
 | Agent | Model | Role |
 |:------|:------|:-----|
 | **story-architect** | Opus | Story architecture — genre positioning, outline structure, hook/twist design, emotion arcs |
 | **character-designer** | Sonnet | Character design — profiles, voice, motivation chains, dialogue writing |
 | **narrative-writer** | Sonnet | Narrative writer — prose writing, de-AI-ify, format compliance |
+| **chapter-editor** | Sonnet | Chapter editor — outline completion, payoff delivery, reader experience, continuity risk review |
 | **consistency-checker** | Haiku | Consistency check — fact conflict scanning, foreshadowing tracking, S1-S4 grading reports |
 | **story-researcher** | Sonnet | Research — CDP search + full-text extraction, multi-source cross-verification, structured reference files |
 | **story-explorer** | Haiku | Story query — read-only character/foreshadowing/setting/progress lookup, quick context loading |
 | **chapter-extractor** | Haiku | Chapter extraction — summaries, plot points, character mentions, parallel deconstruction unit |
 
 Agents load writing theory from `references/` on demand (character design, dialogue techniques, twist toolbox, etc. — 100+ methodology files), without reserving context window space.
+
+### Trae SOLO / Cloud Agents Projectized Setup
+
+`/story-setup` copies the current oh-story-codex pack into the writing project root as `.oh-story-codex/` and creates or merges `AGENTS.md`. This lets SOLO or other Cloud Agents follow the local project skill even when the runtime cannot install global skills.
+
+Executable helper: `skills/story-setup/scripts/deploy-projectized.sh <project-root> [oh-story-codex-root]`.
+
+## Upgrading to v0.6.6
+
+If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack.
+
+This release bumps `agents_version` to v8 and focuses on reducing token blow-ups in 40+ chapter daily long-form writing projects, while adding projectized skill deployment and chapter-editor review:
+
+- After `/story-long-write 日更` enters the daily batch flow, same-batch “continue / rewrite / daily write” requests stay inside `workflow-daily.md` instead of jumping directly to prose writing.
+- Before each chapter, the workflow must read concrete project files from the current run: chapter outline, previous chapter prose, `追踪/上下文.md`, `追踪/伏笔.md`, `追踪/时间线.md`, and character status/settings.
+- The SessionStart hook now warns only for `已过期` or abnormal foreshadowing states; normal open states (`未埋` / `已埋`) no longer trigger full foreshadowing audits.
+- Daily writing only handles incremental foreshadowing changes for the current batch; run `/story-review` explicitly when you need a full audit.
+- `/story-setup` deploys `.oh-story-codex/` and `AGENTS.md` so Trae SOLO / Cloud Agents can use the local skill pack from the project itself.
+- Long-form single-chapter and daily workflows can call `chapter-editor` for review, then revise and re-count when the verdict is REVISE/REWRITE.
 
 ## Automation Hooks
 
