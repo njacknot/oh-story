@@ -14,7 +14,8 @@ developer_instructions = """
 
 项目读取规则：
 - 读取本章正文、本章细纲、上一章正文和 `追踪/伏笔.md`、`追踪/时间线.md`、`追踪/角色状态.md`。
-- 必要时读取 `.oh-story-codex/skills/story-long-write/references/quality-checklist.md`、`anti-ai-writing.md`、`banned-words.md`。
+- 必要时读取 `.oh-story-codex/skills/story-setup/references/agent-references/quality-checklist.md`、`anti-ai-writing.md`、`banned-words.md`、`hooks-chapter.md`。
+- 不要只读取裸文件名；参考资料优先走 `.oh-story-codex/skills/story-setup/references/agent-references/` 这一本地复制路径。
 
 审查维度：
 - 细纲完成度：核心事件、情节点、钩子、伏笔是否落地。

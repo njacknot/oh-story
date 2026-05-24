@@ -46,7 +46,8 @@
 - `agents_version: 4` → 旧版，需重新部署以获取 chapter-extractor agent
 - `agents_version: 5` → 旧版，需重新部署以统一短篇主会话/子代理正文格式
 - `agents_version: 6` → 旧版，需重新部署以获取日更续写与伏笔 hook 修复
-- `agents_version: 7` → 旧版，需重新部署以获取项目化 skill 包与 chapter-editor 单章复审
+- `agents_version: 7` → 旧版，需重新部署以获取 Agent 参考文件路径修复
+- `agents_version: 8` → 旧版，需重新部署以获取 Codex 原生子代理配置
 - `agents_version: 8` + `projectized_skill_version: 1` → 旧版，需重新部署以获取 Codex 原生子代理配置
 - `agents_version: 9` + `projectized_skill_version: 2` + `codex_agents_version: 1` → 当前版本
 
@@ -88,6 +89,12 @@
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/hooks/`、`.claude/agents/`、`.claude/rules/` 并获得新版 hook 行为。
 
 ### v8
+
+- 修复 story-review 及部署后的 reviewer Agent 在项目根目录下读取参考文件时，只找裸文件名（如 `quality-checklist.md`）导致找不到 skill references 的问题。
+- Agent 模板新增参考文件路径规则：优先从 `.claude/skills/` 或 `skills/` 拼接解析 `story-setup/references/agent-references/*.md` 规范路径，避免依赖当前工作目录且不跨 skill 引用 references。
+- 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/agents/` 并获得新版参考文件路径规则。
+
+### v9 (当前)
 
 - 新增 chapter-editor 单章主编 Agent
 - story-long-write 单章写作在字数验证、基础检查、禁用词扫描后执行 chapter-editor 复审

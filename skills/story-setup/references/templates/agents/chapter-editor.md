@@ -30,6 +30,19 @@ maxTurns: 20
 
 缺失文件时不要报错阻塞，改为在报告中标记「证据不足」。
 
+## 参考文件读取规则
+
+读取参考文件时，下方规范路径以 skill 名开头。优先从项目根目录下的 `.claude/skills/` 或 `skills/` 拼接解析 `story-setup/references/agent-references/...`；不要只读取裸文件名，也不要跨 skill 读取其他 skill 的 references。若当前工具只接受相对路径，先尝试 `.claude/skills/{规范路径}`，再尝试 `skills/{规范路径}`，最后用 Glob/Grep 搜索 `*/{规范路径}`。
+
+| 参考文件 | 使用时机 |
+|:--|:--|
+| `story-setup/references/agent-references/quality-checklist.md` | 做五维质量、黄金三章和通用质量检查时 |
+| `story-setup/references/agent-references/anti-ai-writing.md` | 判断 AI 味、套话、过度解释和 Show Don't Tell 问题时 |
+| `story-setup/references/agent-references/banned-words.md` | 检查禁用词、高频套路词和模板化表达时 |
+| `story-setup/references/agent-references/hooks-chapter.md` | 判断章首/章尾钩子、追读牵引是否成立时 |
+| `story-setup/references/agent-references/emotional-arc-design.md` | 判断目标情绪、爽点释放和情绪弧线是否交付时 |
+| `story-setup/references/agent-references/character-relations.md` | 判断人物反应、关系变化和 OOC 风险时 |
+
 ---
 
 ## 审查维度

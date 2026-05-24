@@ -1,4 +1,4 @@
-<!-- Last synced with README.md: 2026-05-21 -->
+<!-- Last synced with README.md: 2026-05-23 -->
 
 **English** | [中文](README.md)
 
@@ -168,16 +168,21 @@ Codex-native setup also deploys:
 - `.codex/config.toml`: subagent concurrency and nesting defaults.
 - `.codex/agents/*.toml`: 8 Codex-native story agents using the same names as the Claude agents.
 
-## Upgrading to v0.6.6
+## Upgrading to v0.6.8
 
-If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack.
+If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack. This fork uses `agents_version` v9: it includes the upstream v8 reviewer path fix and additionally deploys the projectized skill pack, `chapter-editor`, and Codex-native subagents.
 
-This release bumps `agents_version` to v9 and focuses on reducing token blow-ups in 40+ chapter daily long-form writing projects, while adding projectized skill deployment, chapter-editor review, and Codex-native subagents:
+This release merges upstream v0.6.8 while preserving the fork's projectized and subagent features:
 
 - After `/story-long-write 日更` enters the daily batch flow, same-batch “continue / rewrite / daily write” requests stay inside `workflow-daily.md` instead of jumping directly to prose writing.
 - Before each chapter, the workflow must read concrete project files from the current run: chapter outline, previous chapter prose, `追踪/上下文.md`, `追踪/伏笔.md`, `追踪/时间线.md`, and character status/settings.
 - The SessionStart hook now warns only for `已过期` or abnormal foreshadowing states; normal open states (`未埋` / `已埋`) no longer trigger full foreshadowing audits.
 - Daily writing only handles incremental foreshadowing changes for the current batch; run `/story-review` explicitly when you need a full audit.
+- **story-import (import existing novels)**: automatic length routing — long-form runs the full deconstruction pipeline plus long-form project migration, short-form runs the short-form pipeline plus a single-file `正文.md` project. Priority: user declaration > chapter structure > word-count fallback.
+- **story-import**: long-form imports now reverse-engineer `追踪/角色状态.md` so the daily-writing preparation layer no longer falls back to inference when this file is missing.
+- **story-import**: when invoking the deconstruction skill it automatically skips the Stage 1 checkpoint so the "after-golden-three-chapters stop and ask" interaction is not surfaced to import users.
+- **story-review subagent path fix**: reviewers no longer look up bare names like `quality-checklist.md` against the user project's cwd; references are loaded via the owning skill's canonical path.
+- **Qidian scanner fix**: default to mobile SSR scraping with CDP + CAPTCHA fallback, avoiding the PC-site anti-bot block.
 - `/story-setup` deploys `.oh-story-codex/` and `AGENTS.md` so Trae SOLO / Cloud Agents can use the local skill pack from the project itself.
 - Long-form single-chapter and daily workflows can call `chapter-editor` for review, then revise and re-count when the verdict is REVISE/REWRITE.
 - Codex projects receive `.codex/agents/*.toml` and `.codex/config.toml`, enabling native subagents such as `story-architect`, `narrative-writer`, and `chapter-editor`.
