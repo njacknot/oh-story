@@ -74,13 +74,13 @@ flowchart LR
 **Option 1** Tell Claude Code / OpenClaw directly:
 
 ```
-Install this skill https://github.com/worldwonderer/oh-story-claudecode
+Install this skill https://github.com/njacknot/oh-story
 ```
 
 **Option 2** Command line:
 
 ```bash
-npx skills add worldwonderer/oh-story-claudecode -y
+npx skills add njacknot/oh-story -y
 ```
 
 Re-run the same command to update.
@@ -159,9 +159,9 @@ Agents load writing theory from `references/` on demand (character design, dialo
 
 ### Trae SOLO / Cloud Agents Projectized Setup
 
-`/story-setup` copies the current oh-story-codex pack into the writing project root as `.oh-story-codex/` and creates or merges `AGENTS.md`. This lets SOLO or other Cloud Agents follow the local project skill even when the runtime cannot install global skills.
+`/story-setup` copies the current oh-story skill pack into the writing project root as `.oh-story-codex/` and creates or merges `AGENTS.md`. This lets SOLO or other Cloud Agents follow the local project skill even when the runtime cannot install global skills.
 
-Executable helper: `skills/story-setup/scripts/deploy-projectized.sh <project-root> [oh-story-codex-root]`.
+Executable helper: `skills/story-setup/scripts/deploy-projectized.sh <project-root> [oh-story-root]`.
 
 Codex-native setup also deploys:
 
@@ -291,11 +291,11 @@ I built this skill pack to help me through a job-hunting transition :joy:, and I
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=worldwonderer%2Foh-story-claudecode&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=njacknot%2Foh-story&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=worldwonderer/oh-story-claudecode&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=worldwonderer/oh-story-claudecode&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=worldwonderer/oh-story-claudecode&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=njacknot/oh-story&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=njacknot/oh-story&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=njacknot/oh-story&type=date&legend=top-left" />
  </picture>
 </a>
 

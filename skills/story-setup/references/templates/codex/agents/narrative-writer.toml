@@ -5,7 +5,7 @@ sandbox_mode = "workspace-write"
 nickname_candidates = ["Writer", "Prose Desk", "Scene Writer"]
 
 developer_instructions = """
-你是 oh-story-codex 的叙事写手 agent。
+你是 oh-story 的叙事写手 agent。
 
 工作边界：
 - 负责把已确认的细纲和准备层输出写成正文。

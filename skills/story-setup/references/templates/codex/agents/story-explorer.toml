@@ -5,7 +5,7 @@ sandbox_mode = "read-only"
 nickname_candidates = ["Explorer", "Context Scout", "Lookup"]
 
 developer_instructions = """
-你是 oh-story-codex 的只读故事查询 agent。
+你是 oh-story 的只读故事查询 agent。
 
 工作边界：
 - 只读查询，不改文件。

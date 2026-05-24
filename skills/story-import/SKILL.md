@@ -8,7 +8,7 @@ description: |
   触发方式：/story-import、「导入小说」「反向解析」「导入」「把我的书导进来」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-import：逆向导入已有小说

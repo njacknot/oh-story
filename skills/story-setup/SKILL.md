@@ -6,7 +6,7 @@ description: |
   触发方式：/story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-setup：网文写作工具集基础设施部署
@@ -32,7 +32,7 @@ metadata:
    - 不存在 → 跳过
 5. 检查 `.oh-story-codex/` 是否存在
    - 存在 → 显示本地化 skill 包已部署
-   - 不存在 → 后续从当前 oh-story-codex skill 包复制
+   - 不存在 → 后续从当前 oh-story skill 包复制
 6. 检查 `AGENTS.md` 是否存在
    - 存在 → 后续按「AGENTS.md 合并策略」处理
    - 不存在 → 后续创建新文件
@@ -50,8 +50,8 @@ metadata:
 ### 2.1 部署项目化 Skill 包
 
 - 优先运行脚本：
-  `skills/story-setup/scripts/deploy-projectized.sh <用户项目根目录> <当前 oh-story-codex 包根目录>`
-- 定位当前 oh-story-codex 包根目录：从 `skills/story-setup/SKILL.md` 向上两级找到包含 `skills/`、`README.md` 的目录
+  `skills/story-setup/scripts/deploy-projectized.sh <用户项目根目录> <当前 oh-story skill 包根目录>`
+- 定位当前 oh-story skill 包根目录：从 `skills/story-setup/SKILL.md` 向上两级找到包含 `skills/`、`README.md` 的目录
 - 复制整个包到用户项目根目录 `.oh-story-codex/`
 - 复制时排除 `.git/`、`.DS_Store`、`node_modules/`、临时文件和用户项目正文目录
 - 如果 `.oh-story-codex/` 已存在：

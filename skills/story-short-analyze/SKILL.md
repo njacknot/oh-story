@@ -8,7 +8,7 @@ description: |
   「精细拆解」「完整拆解」「深度拆解」或用户要求写作手法/节奏分析——全部进入同一管道。
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-short-analyze：短篇网文拆文

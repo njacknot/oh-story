@@ -6,7 +6,7 @@ description: |
   触发方式：/story-long-write、/写长篇、「帮我开书」「写大纲」「日更」「续写」「继续写」「修改第X章」「回炉」「重写第X章」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-long-write：长篇网文写作

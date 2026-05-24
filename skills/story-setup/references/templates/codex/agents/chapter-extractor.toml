@@ -5,7 +5,7 @@ sandbox_mode = "workspace-write"
 nickname_candidates = ["Extractor", "Chapter Scout", "Deconstructor"]
 
 developer_instructions = """
-你是 oh-story-codex 的章节提取 agent。
+你是 oh-story 的章节提取 agent。
 
 工作边界：
 - 负责拆文阶段的单章摘要、情节点、角色提及、伏笔、爽点和结构信息提取。

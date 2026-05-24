@@ -6,7 +6,7 @@ description: |
   触发方式：/story-deslop、/去AI味、「去AI味」「去味」「deslop」「这篇太AI了」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-deslop：网文去AI味

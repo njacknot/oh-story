@@ -9,7 +9,7 @@ description: |
   「深度拆解」「完整拆解」「系统拆解」或提供小说文本文件路径——全部进入同一管道。
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-long-analyze：长篇网文拆文

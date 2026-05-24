@@ -24,7 +24,7 @@ if [[ ! -d "$project_dir" ]]; then
 fi
 
 if [[ ! -f "$source_root/skills/story/SKILL.md" ]]; then
-  echo "Invalid oh-story-codex root: $source_root" >&2
+  echo "Invalid oh-story root: $source_root" >&2
   exit 1
 fi
 
@@ -57,7 +57,7 @@ fi
 project_name="$(basename "$project_dir")"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
-managed_block="$tmp_dir/AGENTS.oh-story-codex.md"
+managed_block="$tmp_dir/AGENTS.oh-story.md"
 agents_file="$project_dir/AGENTS.md"
 
 merge_codex_config() {

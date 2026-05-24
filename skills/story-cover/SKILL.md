@@ -12,7 +12,7 @@ metadata:
       bins:
         - curl
     primaryEnv: GPT_IMAGE_API_KEY
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-cover：小说封面生成

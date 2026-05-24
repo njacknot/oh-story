@@ -7,7 +7,7 @@ metadata:
     requires:
       bins:
         - agent-browser
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # Browser CDP 操作工具

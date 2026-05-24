@@ -99,7 +99,7 @@
 - 新增 chapter-editor 单章主编 Agent
 - story-long-write 单章写作在字数验证、基础检查、禁用词扫描后执行 chapter-editor 复审
 - 日更模式逐章支持 chapter-editor 复审，REVISE/REWRITE 时修订后重新验字数
-- story-setup 新增项目化部署：复制 oh-story-codex 到项目根 `.oh-story-codex/`，并生成/合并 `AGENTS.md`
+- story-setup 新增项目化部署：复制 oh-story 到项目根 `.oh-story-codex/`，并生成/合并 `AGENTS.md`
 - 新增 `scripts/deploy-projectized.sh`，用于稳定执行 `.oh-story-codex/` 复制和 `AGENTS.md` 托管区块合并
 - Trae SOLO / Cloud Agents 可通过 `AGENTS.md` 使用项目内置 skill，不依赖全局 skill 安装
 

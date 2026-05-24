@@ -6,7 +6,7 @@ description: |
   触发方式：/story-review、/审查、「审查一下」「帮我审一下」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-review：多视角对抗式审查

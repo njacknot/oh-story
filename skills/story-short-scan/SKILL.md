@@ -6,7 +6,7 @@ description: |
   触发方式：/story-short-scan、/短篇扫榜、「短篇什么火」「知乎故事排行」
 metadata:
   openclaw:
-    source: https://github.com/worldwonderer/oh-story-claudecode
+    source: https://github.com/njacknot/oh-story
 ---
 
 # story-short-scan：短篇网文扫榜
