@@ -10,9 +10,13 @@ A web novel writing skill pack for Claude Code and OpenClaw. Covers the full pip
 
 > **Tropes = deterministic emotional payoff**
 
-Professional authors follow a three-step method: 1. Scan — analyze trending charts, identify genres, characters, and entry points. 2. Deconstruct — break down pacing and plot materials, build a personal module library. 3. Commercialize — learn and apply hooks, payoff density, expectation management.
+Professional authors follow a three-step method:
 
-Built around four pillars: reverse-engineering hits, plot modularization, layered state management, and human-AI collaboration.
+1. **Scan** — analyze trending charts, identify genres, characters, and entry points.
+2. **Deconstruct** — break down pacing and plot materials, build a personal module library.
+3. **Commercialize** — learn and apply hooks, payoff density, expectation management.
+
+Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
 
 ## Pipeline Overview
 
@@ -85,6 +89,8 @@ npx skills add njacknot/oh-story -y
 
 Re-run the same command to update.
 
+> After updating, if a project has already run `/story-setup`, re-run `/story-setup` from the project root to sync hooks / agents / references. Per-version changes are in [CHANGELOG.md](CHANGELOG.md) and [Releases](https://github.com/worldwonderer/oh-story-claudecode/releases).
+
 ## Skills
 
 | Skill | Trigger | Description |
@@ -121,6 +127,7 @@ Full output from `/story-long-analyze` deep mode on the first 23 chapters of *Co
 demo/拆文库-盘龙/
 ├── 概要.md              # Novel overview + chapter index
 ├── 拆文报告.md           # 5-dimension scoring + pacing analysis + takeaways
+├── 文风.md              # Benchmark voice: sentence rhythm, punctuation, dialogue subtext, emotion pacing
 ├── 章节/
 │   ├── 第1章_深度拆解.md  # Golden三章 deep analysis
 │   └── 第1-23章_摘要.md   # Per-chapter summary + plot points + character mentions
@@ -134,9 +141,16 @@ demo/拆文库-盘龙/
 ├── 剧情/
 │   └── 故事线.md          # Framework + 4 plotlines + 2 storylines
 └── 设定/
-    ├── 世界观.md          # Power system + geography + factions
-    └── 金手指.md          # Panlong Ring + Delin Cowort
+    ├── 世界观/
+    │   ├── 背景设定.md    # Core rules + special settings
+    │   ├── 力量体系.md    # Battle qi + magic + ranks
+    │   ├── 地理.md        # Andaluxia + Yulan Continent
+    │   └── 金手指.md      # Panlong Ring + Delin Cowort
+    └── 势力/
+        └── 巴鲁克家族.md  # Baluk family (dragon-blood lineage)
 ```
+
+Long-form deconstruction also produces `文风.md`; daily writing reads it to keep dialogue, punctuation, and emotional pacing close to the benchmark.
 
 </details>
 
@@ -168,11 +182,11 @@ Codex-native setup also deploys:
 - `.codex/config.toml`: subagent concurrency and nesting defaults.
 - `.codex/agents/*.toml`: 8 Codex-native story agents using the same names as the Claude agents.
 
-## Upgrading to v0.6.8
+## Upgrading to v0.6.11 / fork v10
 
-If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack. This fork uses `agents_version` v9: it includes the upstream v8 reviewer path fix and additionally deploys the projectized skill pack, `chapter-editor`, and Codex-native subagents.
+If you have already run `/story-setup` inside a writing project, run `/story-setup` again from the project root after updating this skill pack. This fork uses `agents_version` v10: it includes upstream v0.6.9-v0.6.11 style recall, deconstruction pipeline, and reliability fixes, and additionally deploys the projectized skill pack, `chapter-editor`, and Codex-native subagents.
 
-This release merges upstream v0.6.8 while preserving the fork's projectized and subagent features:
+This release merges upstream v0.6.9-v0.6.11 while preserving the fork's projectized and subagent features:
 
 - After `/story-long-write 日更` enters the daily batch flow, same-batch “continue / rewrite / daily write” requests stay inside `workflow-daily.md` instead of jumping directly to prose writing.
 - Before each chapter, the workflow must read concrete project files from the current run: chapter outline, previous chapter prose, `追踪/上下文.md`, `追踪/伏笔.md`, `追踪/时间线.md`, and character status/settings.
@@ -230,6 +244,7 @@ The file system separates settings, outlines, prose, and tracking into independe
 │       ├── Characters/         # Structured character profiles (synced from analyze)
 │       ├── Plotlines/          # Structured plot lines (synced from analyze)
 │       ├── Settings/           # Structured world settings (synced from analyze)
+│       ├── 文风.md              # Benchmark voice used before daily writing
 │       └── Report.md            # Analyze skill output
 ├── Tracking/                # Continuity management (layered tracking)
 │   ├── Context.md           # Writing context (for compact recovery)
@@ -257,6 +272,9 @@ The file system separates settings, outlines, prose, and tracking into independe
 
 Each skill includes a `references/` knowledge base loaded on demand to keep context lean.
 
+<details>
+<summary>Expand the per-skill knowledge-base topic list</summary>
+
 | Topic | Contents | Skill |
 |:------|:---------|:------|
 | Outline Layout | Five-step outline method · Story structure levels · Node design · Progression design | long-write |
@@ -280,6 +298,8 @@ Each skill includes a `references/` knowledge base loaded on demand to keep cont
 | Market Data | Genre trends · Platform characteristics · Collection formats · Submission guides | long-scan / short-scan |
 | Cover Styles | 10 genre visual styles · Color composition · Prompt templates | story-cover |
 | Adversarial Review | Multi-perspective review · Scoring rubrics · Toxic trope detection | story-review |
+
+</details>
 
 ## Supported Platforms
 

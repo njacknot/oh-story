@@ -51,7 +51,8 @@
 - `agents_version: 7` → 旧版，需重新部署以获取 Agent 参考文件路径修复
 - `agents_version: 8` → 旧版，需重新部署以获取 hook lib、reference bundle、root-aware hook 与短篇无副作用修复
 - `agents_version: 8` + `projectized_skill_version: 1` → 旧版，需重新部署以获取 hook lib、reference bundle、root-aware hook、短篇无副作用修复与 Codex 原生子代理配置
-- `agents_version: 9` + `projectized_skill_version: 2` + `codex_agents_version: 1` + `setup_skill_version: 1.1.0` → 当前版本
+- `agents_version: 9` → 旧版，需重新部署以获取新版写作 Agent
+- `agents_version: 10` + `projectized_skill_version: 2` + `codex_agents_version: 1` + `setup_skill_version: 1.1.1` → 当前版本
 
 ## 版本变更
 
@@ -96,7 +97,7 @@
 - Agent 模板新增参考文件路径规则：优先从 `.claude/skills/` 或 `skills/` 拼接解析 `story-setup/references/agent-references/*.md` 规范路径，避免依赖当前工作目录且不跨 skill 引用 references。
 - 已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/agents/` 并获得新版参考文件路径规则。
 
-### v9 (当前)
+### v9
 
 - 新增 chapter-editor 单章主编 Agent
 - story-long-write 单章写作在字数验证、基础检查、禁用词扫描后执行 chapter-editor 复审
@@ -123,4 +124,8 @@
   - `output-templates.md`：不复制；`chapter-extractor` 已内置输出格式，旧的裸引用改写为“遵循本文件输出格式”。
 - `story-format.md` 删除“章节之间用 `---` 分隔”的旧规则，改为禁止正文片段使用水平分隔线，与 narrative-writer 保持一致。
 
-已部署项目需重新运行 `/story-setup`，以覆盖 `.claude/hooks/`、`.claude/agents/`、`.claude/rules/`、`.codex/agents/`，并部署 `.oh-story-codex/`、`AGENTS.md` 和 `.claude/skills/story-setup/references/agent-references/`。
+### v10 (当前)
+
+已部署项目请重新运行 `/story-setup`，刷新写作 Agent；主要影响是日更续写更稳定地沿用对标文风。
+
+本 fork 会同时覆盖 `.claude/hooks/`、`.claude/agents/`、`.claude/rules/`、`.codex/agents/`，并部署 `.oh-story-codex/`、`AGENTS.md` 和 `.claude/skills/story-setup/references/agent-references/`。

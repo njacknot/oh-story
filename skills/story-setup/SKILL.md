@@ -1,6 +1,6 @@
 ---
 name: story-setup
-version: 1.1.0
+version: 1.1.1
 description: |
   网文写作工具集基础设施部署。将本地 .oh-story-codex、AGENTS.md、.codex/agents、hooks/rules/agents/CLAUDE.md 等基础设施部署到用户项目目录。
   触发方式：/story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」
@@ -154,16 +154,16 @@ metadata:
 - 写入以下字段（YAML `key: value` 格式，hook 用 `references/templates/hooks/lib/sentinel.sh` 读取）：
   ```
   deployed_at: <date -u +"%Y-%m-%dT%H:%M:%SZ">
-  agents_version: 9
+  agents_version: 10
   projectized_skill_version: 2
   codex_agents_version: 1
-  setup_skill_version: 1.1.0
+  setup_skill_version: 1.1.1
   target_cli: claude-code
   resolver_strategy: project-local-skill-reference
   references_dir: .claude/skills/story-setup/references/agent-references
   ```
 - 此文件供 session-start.sh 和写作 skill 检测部署状态，避免重复提示
-- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 9，提示用户重新运行 story-setup 以更新 hooks/agents/rules/reference bundle（具体变更见 `UPGRADING.md`）
+- 如果 `.story-deployed` 已存在但无 `agents_version` 或版本 < 10，提示用户重新运行 story-setup 以更新 hooks/agents/rules/reference bundle（具体变更见 `UPGRADING.md`）
 - 如果 `.story-deployed` 已存在但无 `projectized_skill_version` 或版本 < 2，提示用户重新运行 story-setup 以部署 `.oh-story-codex/`、`AGENTS.md` 和 `.codex/agents/`
 - 如果 `.story-deployed` 已存在但无 `codex_agents_version`，提示用户重新运行 story-setup 以补充 Codex 原生子代理配置
 
@@ -187,7 +187,7 @@ metadata:
    - 检查 `.claude/skills/story-setup/references/agent-references/` 下 reference 文件完整
    - 检查所有 `story-setup/references/agent-references/<file>.md` 都能解析到 deployed bundle
 7. 验证部署标记：
-   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 9`、`projectized_skill_version: 2`、`codex_agents_version: 1`、`setup_skill_version: 1.1.0`、`target_cli`、`resolver_strategy`、`references_dir`
+   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 10`、`projectized_skill_version: 2`、`codex_agents_version: 1`、`setup_skill_version: 1.1.1`、`target_cli`、`resolver_strategy`、`references_dir`
 8. 输出安装报告：
    - 列出所有已部署的文件
    - 列出需要注意的事项（如已有配置已合并）
@@ -238,8 +238,8 @@ hooks 注册合并按 command 字段去重：
 ## 重新部署
 
 - `.story-deployed` 不存在 → 全新安装，Phase 2 全部执行
-- `.story-deployed` 存在且 `agents_version: 9` 且 `projectized_skill_version: 2` 且 `codex_agents_version: 1` → 提示已部署，AskUserQuestion 确认是否重新部署
-- `.story-deployed` 存在但 `agents_version` < 9 → 提示需要更新，重新执行 Phase 2 覆盖 agents/hooks/rules/reference bundle，CLAUDE.md、AGENTS.md、`.codex/agents/` 和 settings.local.json 走合并策略
+- `.story-deployed` 存在且 `agents_version: 10` 且 `projectized_skill_version: 2` 且 `codex_agents_version: 1` → 提示已部署，AskUserQuestion 确认是否重新部署
+- `.story-deployed` 存在但 `agents_version` < 10 → 提示需要更新，重新执行 Phase 2 覆盖 agents/hooks/rules/reference bundle，CLAUDE.md、AGENTS.md、`.codex/agents/` 和 settings.local.json 走合并策略
 - `.story-deployed` 存在但没有 `projectized_skill_version` 或版本 < 2 → 提示需要补充项目化部署，执行 2.1、2.2、2.7、2.10，并验证 `.oh-story-codex/`、`AGENTS.md` 与 `.codex/agents/`
 - `.story-deployed` 存在但没有 `codex_agents_version` → 提示需要补充 Codex 原生子代理，执行 2.7、2.10
 

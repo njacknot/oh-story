@@ -50,8 +50,8 @@ for BOOK_DIR in "${BOOK_DIRS[@]}"; do
       function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); return s }
       /^\|/ && $0 !~ /^\|[-[:space:]|]+$/ {
         status=trim($6)
-        if (status == "" || status == "状态" || status ~ /^状态\{/) next
-        if (status == "已过期" || (status != "未埋" && status != "已埋" && status != "已回收")) print
+        if (status ~ /^$/ || status ~ /^状态$/ || status ~ /^状态[{]/) next
+        if (status ~ /^已过期$/ || status !~ /^(未埋|已埋|已回收)$/) print
       }
     ' "$BOOK_DIR/追踪/伏笔.md" 2>/dev/null || true)
     if [ -n "$ABNORMAL_FORESHADOW" ]; then

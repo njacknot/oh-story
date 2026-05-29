@@ -61,8 +61,10 @@ write_sentinel() {
   local root="$1"
   cat > "$root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 9
-setup_skill_version: 1.1.0
+agents_version: 10
+projectized_skill_version: 2
+codex_agents_version: 1
+setup_skill_version: 1.1.1
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
@@ -139,12 +141,20 @@ echo "  OK TS1 hook dependency completeness"
 for header in 'Source path' 'Target path' 'Owner class' 'Merge mode' 'Validation check'; do
   assert_grep "$header" "$SKILL_FILE" "deployment manifest missing column: $header"
 done
-for group in 'templates/hooks/' 'templates/rules' 'templates/agents' 'agent-references' 'settings-hooks\.json' 'CLAUDE\.md' '\.story-deployed'; do
+for group in 'templates/hooks/' 'templates/rules' 'templates/agents' 'agent-references' 'settings-hooks\.json' 'CLAUDE\.md' 'AGENTS\.md' 'templates/codex' '\.story-deployed'; do
   assert_grep "$group" "$SKILL_FILE" "deployment manifest missing asset group: $group"
 done
 assert_grep 'references_dir' "$SKILL_FILE" "sentinel references_dir must be documented"
 assert_grep 'resolver_strategy' "$SKILL_FILE" "sentinel resolver_strategy must be documented"
 assert_grep 'target_cli' "$SKILL_FILE" "sentinel target_cli must be documented"
+assert_grep 'projectized_skill_version' "$SKILL_FILE" "sentinel projectized_skill_version must be documented"
+assert_grep 'codex_agents_version' "$SKILL_FILE" "sentinel codex_agents_version must be documented"
+assert_file "$SKILL_DIR/references/templates/AGENTS.md.tmpl"
+assert_file "$SKILL_DIR/scripts/deploy-projectized.sh"
+assert_file "$SKILL_DIR/references/templates/codex/config.toml.tmpl"
+assert_file "$SKILL_DIR/references/templates/codex/agents/story-architect.toml"
+assert_file "$SKILL_DIR/references/templates/codex/agents/narrative-writer.toml"
+assert_file "$SKILL_DIR/references/templates/codex/agents/chapter-editor.toml"
 echo "  OK TS2 deployment manifest"
 
 # TS3 — Agent reference bundle integrity
@@ -235,8 +245,10 @@ setup_git_repo "$bad_sentinel_root"
 copy_hooks "$bad_sentinel_root"
 cat > "$bad_sentinel_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 9
-setup_skill_version: 1.1.0
+agents_version: 10
+projectized_skill_version: 2
+codex_agents_version: 1
+setup_skill_version: 1.1.1
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
@@ -331,10 +343,13 @@ python3 -m json.tool "$SETTINGS_FILE" >/dev/null
 echo "  OK TS9 settings JSON"
 
 # TS10 — Upgrade notes completeness
-assert_grep 'agents_version: 9|`agents_version: 9`|agents_version`.*9' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 9"
+assert_grep 'agents_version: 10|`agents_version: 10`|agents_version`.*10' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 10"
 assert_grep '/story-setup' "$UPGRADING_FILE" "UPGRADING.md must tell users to rerun /story-setup"
 assert_grep 'hook.*lib|lib/common\.sh|lib/sentinel\.sh' "$UPGRADING_FILE" "UPGRADING.md must document hook lib repair"
 assert_grep 'reference bundle|Agent Reference|agent-references' "$UPGRADING_FILE" "UPGRADING.md must document reference bundle repair"
+assert_grep '新版写作 Agent|写作 Agent|对标文风' "$UPGRADING_FILE" "UPGRADING.md must briefly document the v10 writing-agent refresh"
+assert_grep 'projectized_skill_version: 2|`projectized_skill_version: 2`|projectized_skill_version`.*2' "$UPGRADING_FILE" "UPGRADING.md must document projectized_skill_version 2"
+assert_grep 'codex_agents_version: 1|`codex_agents_version: 1`|codex_agents_version`.*1' "$UPGRADING_FILE" "UPGRADING.md must document codex_agents_version 1"
 echo "  OK TS10 upgrade notes"
 
 echo ""
