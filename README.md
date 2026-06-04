@@ -97,7 +97,7 @@ npx skills add njacknot/oh-story -y -g
 
 `-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
 
-> 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/worldwonderer/oh-story-claudecode/releases)。
+> 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/njacknot/oh-story/releases)。
 
 ## Skills
 
@@ -289,7 +289,6 @@ AGENTS.md                 # Cloud Agents / Trae SOLO 本地协作规则
 短篇/{标题}/
 ├── 正文.md              # 完成稿
 ├── 小节大纲.md          # 8 节结构 + 情绪曲线
-├── 自检_{标题}.md       # 精修检查记录
 └── 拆文库/              # 如有参考小说（analyze 输出）
     └── {书名}/
         ├── 拆文报告.md

@@ -206,7 +206,7 @@ check_skill() {
       [ -z "$ref_name" ] && continue
       # Skip template placeholders and non-ASCII paths (artifact templates)
       [[ "$ref_name" == *"{"* ]] && continue
-      [[ "$ref_name" =~ [^[:ascii:]] ]] && continue
+      printf '%s' "$ref_name" | LC_ALL=C grep -q '[^[:print:]]' && continue
       # Only check filenames that look like reference docs (lowercase ASCII + hyphens + underscores)
       local base_name="$(basename "$ref_name")"
       [[ "$base_name" =~ ^[a-z0-9_-]+\.md$ ]] || continue
