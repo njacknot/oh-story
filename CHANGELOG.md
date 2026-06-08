@@ -6,11 +6,42 @@ All notable changes to this project will be documented in this file.
 
 > fork local：项目化部署 + 单章主编复审 + Codex 原生子代理
 
-- **story-setup**：本 fork 将部署标记保留为 `agents_version` v10，并同步保留上游 v0.6.9-v0.6.14 的文风召回、拆文管线、story-cover、browser-cdp、story-review 等更新。
+- **story-setup**：本 fork 将部署标记保留为 `agents_version` v10，并同步保留上游 v0.6.9-v0.6.15 的文风召回、拆文管线、story-cover、browser-cdp、story-review 等更新。
 - **项目化 skill**：`/story-setup` 同步部署 `.oh-story-codex/` 与 `AGENTS.md`，便于 Trae SOLO / Cloud Agents 在项目内读取本地 skill。
 - **story-long-write**：单章写作与日更流程在禁用词扫描后支持 `chapter-editor` 复审，REVISE/REWRITE 时修订后重新验字数。
 - **Codex 子代理**：保留 `.codex/agents/*.toml` 与 `.codex/config.toml` 模板，`deploy-projectized.sh` 会同步部署 8 个 Codex 原生 story agent。
 - **检查脚本**：修复 macOS bash 下 `static-check.sh` 非 ASCII 路径检测产生的 `[:ascii:]` 正则 warning，并让 `test-charcount-portable.sh --stub` 在本机只有 `python3` 时也能稳定验证 fallback 链路。
+
+## v0.6.15
+
+> 拆文 demo 全量重做（盘龙长篇 / 曾将爱意私藏短篇）+ 新增 story-import 长篇续写工程 demo · story-import 框架修正（交付物＝写作工程，移除 `[导入反推]`）· 拆文契约/门控补强 · story-deslop/story-review 标点规范化（盐言「」保持有效）
+
+### 改进
+
+- **story-import（交付物＝写作工程）**：开篇与原则 1 明确「交付物是可续写的写作工程」——`拆文库/` 是工程的一部分（喂给 `对标/`）、非用完即弃的中间产物；Phase 1 新增「1.0 确认意图」，用户意图不明时主动询问「建写作工程 vs 只要拆文库分析」并分流（只要分析直接走 `/story-long-analyze`）。
+- **移除 `[导入反推]` 约定**：删除 story-import 原「原则 3：标注导入来源」及所有 `[导入反推]` 标记/校验项，不确定字段统一改 `[待补充]`（`SKILL.md` + `structure-mapping-long/short` + `character-state-reverse` 同步）。
+- **story-long-analyze 拆文契约补强 + 基调/主题标签枚举扩展**（#136）。
+- **story-short-analyze 门控/计数口径补强**：情节节点计数口径明确（复合合并共用一个 N 编号、密度校验按最终 N 编号总数计）；Phase 7.1 AI 腔自检补源文豁免规则（跳过 `>` 引用行与表格原文直引列，只扫分析师本人措辞）（#136）。
+- **banned-words 最毒句式补变体**：「不是A，（而）是B」标注「而」可省、省掉也算命中（6 份同步副本一并更新）（#136）。
+
+### Bug 修复
+
+- **标点引导纠偏（Issue #133）**：`story-deslop` / `story-review` 各自内置确定性 破折号/分隔线 规范化器 `normalize-punctuation.js`（skill 内复制一份、不跨 skill 引用）；盐言短篇「」引号保持有效、不被全局判错；写作 references 的 prompt 示例去掉「把 em-dash 节奏当首选散文模式」的教学。
+
+### Demo 与文档
+
+- **拆文 demo 按新契约全量重做**：`demo/拆文库-盘龙`（长篇拆文）、`demo/拆文库-曾将爱意私藏`（短篇拆文，替换原文缺失的「影子拳手」demo）。
+- **新增 story-import 长篇续写工程 demo**：`demo/让你管账号，你高燃混剪炸全网`——番茄前 20 章逆向重建为可续写工程（正文 / 设定 / 大纲 / 追踪 / 参考资料），可直接 `/story-long-write` 日更续写第 21 章。
+- **README / README_EN**：新增三个 demo 展示块（短篇拆文 / 长篇拆文 / 长篇续写工程）+ 交流群与 Discussions 链接（#131）。
+
+### 工程
+
+- **check-shared-files 守卫同名 script 副本**：跨 skill 同名脚本（如 `normalize-punctuation.js`）强制字节一致，防止复制副本漂移。
+
+### 说明
+
+- 同名共享文件改动均按 `check-shared-files.sh` 字节同步到全部副本；本地五道守卫（shared-files / python-invocation / story-setup-deployment / hook-regex-sync / static-check）全绿。
+- marketplace metadata.version 0.6.14 → 0.6.15。
 
 ## v0.6.14
 

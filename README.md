@@ -166,6 +166,43 @@ demo/拆文库-盘龙/
 
 </details>
 
+<details>
+<summary>拆文 demo — 曾将爱意私藏（短篇）</summary>
+
+使用 `/story-short-analyze` 拆解短篇《曾将爱意私藏》（约 8500 字，追妻火葬场 · 死遁）的完整输出：
+
+```
+demo/拆文库-曾将爱意私藏/
+├── 原文/原文.txt        # 原文备份
+├── 拆文报告.md          # 故事核 + 五维评分 + 爆点6维 + 认知反转 + 共鸣9层
+├── 情节节点.md          # 54 个情节节点（原文引用 + 情绪标记 −9~+9）
+├── 写作手法.md          # POV / 对话 / 信息差 / 物件钩子 等 11 项
+└── _meta.json           # 结构计数 structure_counts（Phase 7 门控依据）
+```
+
+短篇拆文产出 `拆文报告 / 情节节点 / 写作手法`，下游 `/story-short-write` 据此写同题材新短篇。
+
+</details>
+
+<details>
+<summary>导入 demo — 让你管账号，你高燃混剪炸全网（长篇续写工程）</summary>
+
+使用 `/story-import` 把作者已发布的前 20 章（约 3.7 万字）逆向重建为可续写的写作工程，接 `/story-long-write` 日更续写第 21 章：
+
+```
+demo/让你管账号，你高燃混剪炸全网/
+├── 正文/        第001–020章（已发布原文）
+├── 大纲/        大纲.md · 卷纲_第1卷.md · 细纲_第001–020章.md（1 章 1 文件）
+├── 设定/        角色/{江晨·钟嘉嘉·周薄森·张耀祖·吴伟·李林}
+│                世界观/{背景设定·金手指} · 关系.md · 题材定位.md · 文风.md
+├── 追踪/        伏笔.md · 时间线.md · 角色状态.md · 上下文.md
+└── 参考资料/    作品信息.md
+```
+
+逐章提取（事件 / 角色 / 设定 / 伏笔 / 时间线）反推为续写 bible，作者从第 21 章无缝接着写。
+
+</details>
+
 ## Agent 体系
 
 写作 skill 内部通过 8 个专业 Agent 协作，各司其职：
@@ -339,7 +376,7 @@ AGENTS.md                 # Cloud Agents / Trae SOLO 本地协作规则
 
 **短篇** 知乎盐言故事 · 番茄短篇 · 七猫短篇
 
-真实产出样例见 [demo/](demo/)：短篇《曾将爱意私藏》约 8500 字 · 封面《剑道独尊》示例图。
+真实产出样例见 [demo/](demo/)：短篇拆文《曾将爱意私藏》· 长篇拆文《盘龙》· 长篇续写工程《让你管账号，你高燃混剪炸全网》· 封面《剑道独尊》示例图。
 
 这套 skill 现在能让我度过找工作的过渡期 :joy:，希望也能帮到有需要的朋友。
 
@@ -356,6 +393,11 @@ AGENTS.md                 # Cloud Agents / Trae SOLO 本地协作规则
 ## 贡献
 
 欢迎贡献新 skill、补充知识库、更新市场数据。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 交流
+
+- **Telegram 群**：<https://t.me/ohstoryclaudecode> —— 日常交流、踩坑、新功能讨论。
+- **GitHub Discussions**：[提问 / 求助 / 分享用法](https://github.com/njacknot/oh-story/discussions)，方便检索。
 
 ## License
 
