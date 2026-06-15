@@ -6,11 +6,40 @@ All notable changes to this project will be documented in this file.
 
 > fork local：项目化部署 + 单章主编复审 + Codex 原生子代理
 
-- **story-setup**：本 fork 将部署标记保留为 `agents_version` v10，并同步保留上游 v0.6.9-v0.6.15 的文风召回、拆文管线、story-cover、browser-cdp、story-review 等更新。
+- **story-setup**：本 fork 将部署标记保留为 `agents_version` v10，并同步保留上游 v0.6.9-v0.6.16 的文风召回、拆文管线、story-cover、browser-cdp、story-review、扫榜脚本健壮性和破折号规范化等更新。
 - **项目化 skill**：`/story-setup` 同步部署 `.oh-story-codex/` 与 `AGENTS.md`，便于 Trae SOLO / Cloud Agents 在项目内读取本地 skill。
 - **story-long-write**：单章写作与日更流程在禁用词扫描后支持 `chapter-editor` 复审，REVISE/REWRITE 时修订后重新验字数。
 - **Codex 子代理**：保留 `.codex/agents/*.toml` 与 `.codex/config.toml` 模板，`deploy-projectized.sh` 会同步部署 8 个 Codex 原生 story agent。
 - **检查脚本**：修复 macOS bash 下 `static-check.sh` 非 ASCII 路径检测产生的 `[:ascii:]` 正则 warning，并让 `test-charcount-portable.sh --stub` 在本机只有 `python3` 时也能稳定验证 fallback 链路。
+
+## v0.6.16
+
+> 扫榜全平台健壮性实测修复：番茄书名全回退 `bookId:xxx` 修复 + 题材/标签扩采 · 点众/七猫/刺猬猫书名与作品页链接修复 · 黑岩错误态细分 · 晋江补详情页核心指标采集 · 全平台连通性自检/质量信号 · 拆解管道合法性语境 · 写作流程破折号过滤 · prompt-cache 优化
+
+### Bug 修复（扫榜）
+
+- **番茄扫榜书名全回退 `bookId:xxx` 修复**：根因是详情解码把整页约 20 本一次性同步 XHR 塞进一个 eval，撞 `cdp-utils.ab()` 的 20s 硬超时 → 静默返回空 → 每本回退 bookId。改为分批解码（每 5 本）+ 多策略解析（内嵌 JSON `bookName` / `<title>` / og:meta），并加连通性自检与「标题解析率 / 数据质量」文件头标注（#144）。
+- **点众扫榜书名是 UI 文字/简介串 → 重写**：改为按 `bookId` 聚合 anchor 解析（书名取「书名+评分」anchor 去尾部 `X.X分`、简介取最长 anchor、作者/状态/字数从卡片文本），实测书名 10/10、作品页链接 10/10（#144）。
+- **七猫 / 刺猬猫作品页链接几乎全失修复**：`extractBookUrls` 旧版按 bookId 取到的是排名数字 / 空封面 anchor 当书名导致回填失败；改为取最像书名的 anchor + 书名归一回填，实测链接 20/21、10/10；七猫频道 tab 点击失败自动重试一次（#144）。
+- **黑岩扫榜错误态误报修复**：把「接口超时 / CDP 断」「401 未授权」「服务端错误码」分开报错，不再一律误报「认证失败」+ 套用 DOM 选择器话术；加书名命中率质量门，字段改名时拦截而非静默写 undefined（#144）。
+- **拆解管道补材料合法性语境**：消除对用户自有作品的过度拒绝（#143）。
+- **长篇写作流程破折号过滤**：自动过滤破折号 + 修正规范化器误伤合法破折号（#139 / #141）。
+
+### 改进（扫榜）
+
+- **晋江补详情页采集**：列表取书名 / 作者 / `novelid` 后进 `onebook.php` 详情页，用 `fetch + TextDecoder('gb18030')` 解出 `itemprop` 微数据（收藏 / 营养液 / 积分 / 字数 / 状态，公开指标无需登录）；受 `--top` / `--detail-limit` 控量，`--list-only` 可跳过（#144）。
+- **番茄题材 / 标签扩采**：题材取详情页 `categoryV2` 首个 `Name`、标签取简介开头 `【…】`（番茄 SSR 无评分字段，已移除评分声明）（#144）。
+- **全平台扫榜健壮性统一**：浏览器型脚本统一连通性自检（CDP 未起 / 被重定向 → 可操作报错，替代误导性「结构已变」）、复杂 eval 走 base64（消除 shell 转义隐患）、输出文件头加质量信号（链接 / 书名 / 标题解析率、详情命中率）（#144）。
+
+### 性能
+
+- **削减 prompt-cache miss**：`story-deslop` / `narrative-writer` / `story-long-analyze` 拆解管道的提示词缓存未命中优化（#142）。
+
+### 说明
+
+- 扫榜修复均经真站实测（隔离 headless Chrome 逐平台跑通）+ sandbox 测试（番茄 31 / 晋江 10 断言）验证；`cdp-utils.js` 未改动，跨 skill 双副本仍字节一致。
+- 本地守卫（shared-files / static-check 等）全绿。
+- marketplace metadata.version 0.6.15 → 0.6.16。
 
 ## v0.6.15
 
