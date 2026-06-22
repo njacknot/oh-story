@@ -6,11 +6,37 @@ All notable changes to this project will be documented in this file.
 
 > fork local：项目化部署 + 单章主编复审 + Codex 原生子代理
 
-- **story-setup**：本 fork 将部署标记保留为 `agents_version` v10，并同步保留上游 v0.6.9-v0.6.16 的文风召回、拆文管线、story-cover、browser-cdp、story-review、扫榜脚本健壮性和破折号规范化等更新。
+- **story-setup**：本 fork 将部署标记升级到 `agents_version` v14，并同步保留上游 v0.6.9-v0.6.17 的文风召回、拆文管线、story-cover、browser-cdp、story-review、扫榜脚本健壮性、破折号规范化、章节蓝图、语气标点谱系和 AI 句式硬门槛等更新。
 - **项目化 skill**：`/story-setup` 同步部署 `.oh-story-codex/` 与 `AGENTS.md`，便于 Trae SOLO / Cloud Agents 在项目内读取本地 skill。
 - **story-long-write**：单章写作与日更流程在禁用词扫描后支持 `chapter-editor` 复审，REVISE/REWRITE 时修订后重新验字数。
 - **Codex 子代理**：保留 `.codex/agents/*.toml` 与 `.codex/config.toml` 模板，`deploy-projectized.sh` 会同步部署 8 个 Codex 原生 story agent。
 - **检查脚本**：修复 macOS bash 下 `static-check.sh` 非 ASCII 路径检测产生的 `[:ascii:]` 正则 warning，并让 `test-charcount-portable.sh --stub` 在本机只有 `python3` 时也能稳定验证 fallback 链路。
+
+## v0.6.17
+
+> 用户反馈专项：长篇细纲升级为章节蓝图（#162）· 语气标点谱系（#161）· story-setup v13 部署刷新 · 汇入 v0.6.16 之后的深度限知、正文元信息、拆文模块链、review 一致性、段落/主语节奏等修复
+
+### 新增 / 改进
+
+- **长篇细纲升级为章节蓝图（#162）**：`story-long-write` 的 `大纲/细纲_第XXX章.md` 保留旧字段（核心事件、目标情绪、章首/章尾钩子、爽点、字数目标），新增内容概括（起因/发展/转折/高潮/结尾）、情节安排（主线/辅线/事件线/感情线/逻辑线）、人物关系和出场顺序、情节细化、结尾设定和钩子。
+- **日更与导入消费新版蓝图**：日更准备层会显式读取内容概括、多线安排、人物出场、代价/收益与章尾承接；旧版细纲缺新版字段不阻塞，补建/回填未知项统一写 `[待补充]`；`story-import` 只从证据反推新版字段，不编造副线或关系。
+- **细纲蓝图上下游贯通（#162 下游细化）**：把已有 craft reference 接进日更写作/核对闭环，复用现有字段、零新概念——`内容概括` 发展/转折按 `plot-emotion-system` 倒推法做爽点铺垫（不铺=空洞）；`视角/信息差` 经 `出场顺序` 的在场配角放大成差异化反应（`plot-core-methods` 集体震惊）；`情节点功能标签` 即 `commercial-core-methods` 目的词，驱动展开/带过详略。落在 `story-long-write` 写前准备（3.3/2.4）+ 对照细纲核对（每条带修复动作），`story-architect` 模板同步叫法对齐；不新增字段/文件，旧细纲仍非阻塞。
+- **短篇小节大纲轻量增强**：`小节大纲.md` 增加结构段/五段功能、人物/关系变化、因果/逻辑链、结尾承接/钩子等字段，但不套长篇完整章节蓝图，避免短篇流程变重。
+- **术语白话化（去自造黑话，语义不变）**：把作者面向的晦涩自造/借用复合词换成白话——蓝图兑现→对照细纲核对、三维度织入→三维度揉进、镜头断段→画面分段、最简记忆包→本节速记、质量门控→质量检查、准备层→写前准备、角色位抽象→看成功能位、五重驱动→五项驱动、孤立情节兜底→散落情节兜底、结构物件→贯穿道具、三现编排→三次出现、few-shot→范例片段、目标函数→目标、字数探针→字数检查 等；保留 功能位/信息团/目的词/戏剧单元/疏密分配 等行业真实术语；跨 skill 字节同构副本同步，本地守卫全绿。
+- **语气标点谱系（#161）**：writer references、`narrative-writer`、`story-review`、`story-deslop` 增加“标点服务语气/人物声线”的规则：质问用问号，爆发峰值少量感叹；犹豫/未尽/打断/拖长改用动作停顿、短句或换行处理，正文产物不再使用 `……` / `——`；同时明确禁止通篇句号化和随机标点堆砌。
+- **story-setup v13**：`setup_skill_version` 升级到 `1.2.2`、`.story-deployed` 的 `agents_version` 升级到 `13`；`story-architect` 产出新版章节蓝图，`consistency-checker` 消费逻辑线/人物关系变化/出场顺序/代价兑现，session-start 对 v12 及以下提示重新部署。
+- **v0.6.16 后已合入改进汇总**：包含写正文前细纲守卫与 subagent solo 降级修复（#148）、深度限知视角/去解释腔/情绪烈度（#147/#152）、正文中禁止章节元信息（#155）、副对标书数量放宽（#157）、story-review 推理型一致性检查（#158）、拆文→可复用写作模块链（#149/#156）、清理过期市场指导（#160）、段落/主语节奏自然化（#159）。
+
+### 修复
+
+- **skill 指令一致性（左右互搏收敛）**：统一 `story-long-write` 日更读取列表与 `workflow-daily.md` 中 `剧情/情绪模块.md` / `剧情/节奏.md` 的缺失措辞——明确 v12 新契约缺失停下修复、仅 legacy 回退，消除与权威「缺失文件回退」规则的冲突；`story` 路由的「查故事资料 / 查资料」改为先做轻量 agent 可用性检查，不可用时降级直接 Read/Grep 并标注 `Fallback: agent unavailable -> direct lookup`，不再无条件直接 spawn。
+- **标点规范化器边界修复**：`normalize-punctuation.js` 对紧跟开引号 / 开括号（`「『（(“‘`）的 `……` / `——` 删空处理，修复 `「……你回来了。」` 被误改成 `「，你回来了。」`、`「……」` 被改成 `「。」` 的问题；句末拖长、数字区间、冒号落点等既有行为不变（4 份副本保持字节一致）。
+
+### 发布准备
+
+- `CHANGELOG.md` 新增 v0.6.17 条目；`.claude-plugin/marketplace.json` metadata.version 0.6.16 → 0.6.17。
+- 由于 story-setup templates/rules/references 更新，已部署项目需重新运行 `/story-setup`，并在部署后新开 Claude Code 会话。
+- 根目录 `.claude/` 仍视为 ignored 本地部署镜像，不作为发布源；canonical source 位于 `skills/**`、`scripts/**`、`CHANGELOG.md` 和 `.claude-plugin/marketplace.json`。
 
 ## v0.6.16
 

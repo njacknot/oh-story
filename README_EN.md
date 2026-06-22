@@ -1,4 +1,4 @@
-<!-- Last synced with README.md: 2026-05-23 -->
+<!-- Last synced with README.md: 2026-06-18 -->
 
 **English** | [中文](README.md)
 
@@ -17,6 +17,8 @@ Professional authors follow a three-step method:
 3. **Commercialize** — learn and apply hooks, payoff density, expectation management.
 
 Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
+
+> Starting in v0.6.17, long-form outlines become richer chapter blueprints (five-stage summary, multi-line plot plan, relationship/order tracking, ending hooks), and prose/review guidance adds tone-aware punctuation to avoid all-period flattening.
 
 ## Pipeline Overview
 
@@ -91,6 +93,8 @@ npx skills add njacknot/oh-story -y -g
 
 > After updating, if a project has already run `/story-setup`, re-run `/story-setup` from the project root to sync hooks / agents / references. Per-version changes are in [CHANGELOG.md](CHANGELOG.md) and [Releases](https://github.com/njacknot/oh-story/releases).
 
+> **Multi-agent collaboration needs setup + a fresh session**: the 7 specialist agents (story-architect, narrative-writer, consistency-checker, etc.) are written into your project's `.claude/agents/` by `/story-setup`. Claude Code only registers custom agents **at session start**, so **after `/story-setup` finishes you must open a new Claude Code session** before story-review's multi-perspective review and the agent collaboration in the writing flow take effect; otherwise skills get "subagent_type unavailable" and fall back to solo (single perspective). To check: run `/story-review` in the new session — a header of `Effective Mode: full/lean` means agents registered, `Fallback: ... -> solo` means you're still in the old session.
+
 ## Skills
 
 | Skill | Trigger | Description |
@@ -139,7 +143,9 @@ demo/拆文库-盘龙/
 │   ├── 沃顿.md           # Functional character
 │   └── 角色关系.md        # Relationship network
 ├── 剧情/
-│   └── 故事线.md          # Framework + 4 plotlines + 2 storylines
+│   ├── 故事线.md          # Framework + 4 plotlines + 2 storylines
+│   ├── 节奏.md            # Pacing + key-info progression + emotional trigger eruption rhythm
+│   └── 情绪模块.md        # Reader needs + emotional engine + reusable writing modules
 └── 设定/
     ├── 世界观/
     │   ├── 背景设定.md    # Core rules + special settings
@@ -150,7 +156,7 @@ demo/拆文库-盘龙/
         └── 巴鲁克家族.md  # Baluk family (dragon-blood lineage)
 ```
 
-Long-form deconstruction also produces `文风.md`; daily writing reads it to keep dialogue, punctuation, and emotional pacing close to the benchmark.
+Long-form deconstruction also produces `文风.md`, plus `剧情/节奏.md` (pacing, key-info progression, emotional trigger eruption rhythm) and `剧情/情绪模块.md` (reader needs, emotional engine, reusable writing modules); daily writing consumes these through `对标/{书名}/剧情/` to keep voice, pacing, and emotion modules close to the benchmark.
 
 </details>
 
@@ -240,7 +246,7 @@ This release merges upstream v0.6.9-v0.6.11 while preserving the fork's projecti
 
 ## Automation Hooks
 
-6 hooks deployed automatically by `/story-setup`:
+7 hooks deployed automatically by `/story-setup`:
 
 | Hook | Trigger | Function |
 |:-----|:---------|:---------|
@@ -250,6 +256,7 @@ This release merges upstream v0.6.9-v0.6.11 while preserving the fork's projecti
 | pre-compact.sh | Before context compaction | Save progress snapshot path and line-count summary |
 | post-compact.sh | After context compaction | Prompt to read progress snapshot for context recovery |
 | validate-story-commit.sh | git commit | Check hardcoded attributes, setting required fields (warning only, non-blocking) |
+| guard-outline-before-prose.sh | Before writing prose (Write/Edit) | Blocks first creation of a chapter/story body when its 细纲/小节大纲 is missing (blocking) — enforces outline-first |
 
 ## Project File Structure
 
@@ -270,7 +277,7 @@ The file system separates settings, outlines, prose, and tracking into independe
 ├── Outline/
 │   ├── Outline.md          # Full-book volume-level structure
 │   ├── Volume_1.md         # One per volume: payoff pacing + emotion arc + character arc + foreshadowing + twists
-│   ├── Chapter_001.md      # One per chapter: events + hooks + payoffs + suspense
+│   ├── Chapter_001.md      # One per chapter: summary + multi-line plot + relationships/order + hooks
 │   └── ...
 ├── Prose/
 │   ├── Chapter_001_Title.md
@@ -279,7 +286,7 @@ The file system separates settings, outlines, prose, and tracking into independe
 │   └── {Benchmark Book}/
 │       ├── Source/              # Benchmark book original chapters
 │       ├── Characters/         # Structured character profiles (synced from analyze)
-│       ├── Plotlines/          # Structured plot lines (synced from analyze)
+│       ├── Plotlines/          # Structured plot lines/pacing/emotion modules (synced from analyze)
 │       ├── Settings/           # Structured world settings (synced from analyze)
 │       ├── 文风.md              # Benchmark voice used before daily writing
 │       └── Report.md            # Analyze skill output
@@ -305,7 +312,7 @@ The file system separates settings, outlines, prose, and tracking into independe
         └── 写作手法.md
 ```
 
-**Deconstruction Library:** Deconstruction skills save structured outputs (characters, plotlines, settings, chapters) under `拆文库/{Book Title}/` at project root. Writing skills consume these assets through the `Benchmark/` subdirectory, or automatically fall back to reading from the deconstruction library.
+**Deconstruction Library:** Deconstruction skills save structured outputs (characters, plotlines, settings, chapters) under `拆文库/{Book Title}/` at project root; long-form plot output includes `节奏.md` and `情绪模块.md`. Writing skills consume these assets through `对标/{书名}/剧情/` and related benchmark subdirectories, or automatically fall back to reading from the deconstruction library.
 
 ## Knowledge Base
 

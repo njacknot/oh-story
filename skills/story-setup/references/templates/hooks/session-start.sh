@@ -17,12 +17,27 @@ fi
 source "$HOOK_DIR/lib/common.sh"
 source "$HOOK_DIR/lib/sentinel.sh"
 
+# 字节稳定区域：本 hook 经 discover_active_book 处理中文书名/路径。Windows 中文系统若导出
+# GBK 区域设置，locale 敏感操作会按多字节错解 UTF-8。强制 C 区域走字节处理才稳（issue #164
+# 同类）。本 hook 无内嵌 python，可直接 export。
+export LC_ALL=C
+
 ROOT=$(project_root)
+
+# story-setup 部署后的一次性重启确认。custom agents 只在会话启动时被注册成
+# subagent_type；story-setup 部署完会留下 .claude/.agents-pending-restart 标记。
+# 走到这里说明已是新会话、agents 已随会话重新加载——确认并清除标记（一次性）。
+if [ -f "$ROOT/.claude/.agents-pending-restart" ]; then
+  OUTPUT+="[INFO] story-setup 刚部署/更新了 agents，本会话已重新加载——story-architect、narrative-writer 等 custom agent 现已注册可用。\n"
+  OUTPUT+="  若写作 skill 仍提示 spawn 失败 / 降级 solo，说明你还在部署时的旧会话里，请再新开一个 Claude Code 会话。\n\n"
+  HAS_CONTENT=true
+  rm -f "$ROOT/.claude/.agents-pending-restart" 2>/dev/null || true
+fi
 
 # 部署自检：.story-deployed 存在但 hooks 文件被误删时发出警告
 if sentinel_exists "$ROOT/.story-deployed"; then
   MISSING_HOOKS=""
-  for hook in session-start.sh session-end.sh detect-story-gaps.sh pre-compact.sh post-compact.sh validate-story-commit.sh lib/common.sh lib/sentinel.sh; do
+  for hook in session-start.sh session-end.sh detect-story-gaps.sh pre-compact.sh post-compact.sh validate-story-commit.sh guard-outline-before-prose.sh lib/common.sh lib/sentinel.sh; do
     if [ ! -f "$ROOT/.claude/hooks/$hook" ]; then
       MISSING_HOOKS+="$hook "
     fi
@@ -40,8 +55,8 @@ if sentinel_exists "$ROOT/.story-deployed"; then
       HAS_CONTENT=true
       ;;
     *)
-      if [ "$AGENTS_VERSION" -lt 10 ]; then
-        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v10。重新运行 /story-setup 刷新 hooks、agents 和 references。\n\n"
+      if [ "$AGENTS_VERSION" -lt 14 ]; then
+        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v14。重新运行 /story-setup 刷新 hooks、agents 和 references（部署后需新开会话）。\n\n"
         HAS_CONTENT=true
       fi
       ;;

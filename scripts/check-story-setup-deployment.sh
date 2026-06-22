@@ -61,10 +61,10 @@ write_sentinel() {
   local root="$1"
   cat > "$root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 10
+agents_version: 14
 projectized_skill_version: 2
 codex_agents_version: 1
-setup_skill_version: 1.1.1
+setup_skill_version: 1.2.3
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
@@ -245,16 +245,31 @@ setup_git_repo "$bad_sentinel_root"
 copy_hooks "$bad_sentinel_root"
 cat > "$bad_sentinel_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 10
+agents_version: 14
 projectized_skill_version: 2
 codex_agents_version: 1
-setup_skill_version: 1.1.1
+setup_skill_version: 1.2.3
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
 bad_sentinel_out="$(run_from_nested "$bad_sentinel_root" session-start.sh 2>&1 || true)"
 echo "$bad_sentinel_out" | grep -q '缺少 target_cli' || fail "session-start did not warn for missing sentinel target_cli"
 echo "$bad_sentinel_out" | grep -q '参考资料包缺失或为空' || fail "session-start did not warn for missing deployed reference bundle"
+
+stale_v13_root="$TMP_DIR/stale-v13"
+mkdir -p "$stale_v13_root/.claude/skills/story-setup/references/agent-references"
+setup_git_repo "$stale_v13_root"
+copy_hooks "$stale_v13_root"
+cat > "$stale_v13_root/.story-deployed" <<'SENTINEL'
+deployed_at: 2026-05-24T00:00:00Z
+agents_version: 13
+setup_skill_version: 1.2.2
+target_cli: claude-code
+resolver_strategy: project-local-skill-reference
+references_dir: .claude/skills/story-setup/references/agent-references
+SENTINEL
+stale_v13_out="$(run_from_nested "$stale_v13_root" session-start.sh 2>&1 || true)"
+echo "$stale_v13_out" | grep -q '低于 v14' || fail "session-start did not warn for agents_version 13 stale v14 deployment"
 echo "  OK TS5 sentinel diagnostics"
 
 # TS6 — Short project non-mutation
@@ -343,14 +358,101 @@ python3 -m json.tool "$SETTINGS_FILE" >/dev/null
 echo "  OK TS9 settings JSON"
 
 # TS10 — Upgrade notes completeness
-assert_grep 'agents_version: 10|`agents_version: 10`|agents_version`.*10' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 10"
+assert_grep 'agents_version: 13|`agents_version: 13`|agents_version`.*13' "$UPGRADING_FILE" "UPGRADING.md must retain agents_version 13 history"
+assert_grep 'agents_version: 14|`agents_version: 14`|agents_version`.*14' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 14"
+assert_grep 'setup_skill_version.*1\.2\.3' "$UPGRADING_FILE" "UPGRADING.md must document setup_skill_version 1.2.3"
+assert_grep 'AGENTS_VERSION.*-lt 14|AGENTS_VERSION" -lt 14' "$HOOKS_DIR/session-start.sh" "session-start must warn for agents_version 13 under v14 deployment"
+assert_grep 'agents_version.*< 14|版本 < 14' "$SKILL_DIR/SKILL.md" "story-setup redeploy branch must treat agents_version 13 as stale"
+assert_grep 'agents_version.*小于 `14`|小于 .14' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 13 as stale"
 assert_grep '/story-setup' "$UPGRADING_FILE" "UPGRADING.md must tell users to rerun /story-setup"
 assert_grep 'hook.*lib|lib/common\.sh|lib/sentinel\.sh' "$UPGRADING_FILE" "UPGRADING.md must document hook lib repair"
 assert_grep 'reference bundle|Agent Reference|agent-references' "$UPGRADING_FILE" "UPGRADING.md must document reference bundle repair"
 assert_grep '新版写作 Agent|写作 Agent|对标文风' "$UPGRADING_FILE" "UPGRADING.md must briefly document the v10 writing-agent refresh"
 assert_grep 'projectized_skill_version: 2|`projectized_skill_version: 2`|projectized_skill_version`.*2' "$UPGRADING_FILE" "UPGRADING.md must document projectized_skill_version 2"
 assert_grep 'codex_agents_version: 1|`codex_agents_version: 1`|codex_agents_version`.*1' "$UPGRADING_FILE" "UPGRADING.md must document codex_agents_version 1"
+assert_grep '关键信息与扩写技法' "$UPGRADING_FILE" "UPGRADING.md must document v12 key-information expansion"
+assert_grep '剧情/节奏\.md|`剧情/节奏\.md`|节奏\.md' "$UPGRADING_FILE" "UPGRADING.md must document v12 rhythm artifact"
+assert_grep '剧情/情绪模块\.md|`剧情/情绪模块\.md`|情绪模块\.md' "$UPGRADING_FILE" "UPGRADING.md must document v12 emotion module artifact"
+assert_grep 'selected_emotion_module' "$UPGRADING_FILE" "UPGRADING.md must document story-explorer selected_emotion_module"
+assert_grep 'rhythm_reference' "$UPGRADING_FILE" "UPGRADING.md must document story-explorer rhythm_reference"
+assert_grep 'contract_version.*v12|gaps\.contract_version == "v12"' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must classify v12 benchmark contracts before fallback"
+assert_grep 'contract_version.*legacy|legacy_deconstruction: true|legacy_deconstruction": true' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must classify legacy benchmark fallback explicitly"
+assert_grep 'missing_primary_contract: true|missing_primary_contract": true' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must emit missing_primary_contract for broken v12 canonical artifacts"
+assert_grep 'repair_action.*Stage 3|Stage 3.*repair_action|重跑 /story-long-analyze Stage 3' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must provide a v12 repair action instead of silent fallback"
+assert_grep 'legacy_deconstruction: true|missing_primary_contract' "$REPO_ROOT/skills/story-long-write/SKILL.md" "story-long-write must not silently fallback for v12 primary contract gaps"
+assert_grep '章节蓝图|内容概括|情节安排|人物关系和出场顺序|结尾设定和钩子' "$UPGRADING_FILE" "UPGRADING.md must document v13 chapter blueprint"
+assert_grep '语气标点谱系' "$UPGRADING_FILE" "UPGRADING.md must document v13 tone punctuation"
+assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$UPGRADING_FILE" "UPGRADING.md must document no ellipsis pause punctuation"
+assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——' "$UPGRADING_FILE" "UPGRADING.md must document no dialogue dash exception"
+assert_grep '内容概括（五段式）|情节安排（多线）|人物关系和出场顺序|结尾设定和钩子' "$SKILL_DIR/references/templates/agents/story-architect.md" "story-architect must output v13 chapter blueprint fields"
+assert_grep '逻辑线|人物关系变化|代价兑现 / 收益兑现|结尾设定' "$SKILL_DIR/references/templates/agents/consistency-checker.md" "consistency-checker must consume v13 outline blueprint fields"
+assert_grep '语气标点谱系' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must enforce v13 tone punctuation"
+assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must reject ellipsis pause punctuation"
+assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must reject dialogue dash exception"
+assert_grep '语气标点谱系' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must include v13 tone punctuation format rules"
+assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid ellipsis pause punctuation"
+assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——|正文和对话都禁止.*——' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid dialogue dash exception"
+assert_grep 'AI 句式硬门槛.*issue #166|issue #166.*AI 句式硬门槛' "$UPGRADING_FILE" "UPGRADING.md must document v14 AI sentence gate and issue #166"
+assert_grep '先否定再肯定' "$UPGRADING_FILE" "UPGRADING.md must document the forbidden not-then-is flip"
+assert_grep 'check-ai-patterns\.js.*复扫到 0|复扫到 0.*check-ai-patterns\.js' "$UPGRADING_FILE" "UPGRADING.md must document detector rescan to zero"
+assert_grep '禁止先否定再肯定翻转句式' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must hard-ban not-then-is flips"
+assert_grep 'check-ai-patterns\.js --check' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must require detector rescan handoff"
 echo "  OK TS10 upgrade notes"
+
+# TS11 — Outline-before-prose write guard (BLOCKING PreToolUse hook)
+guard_root="$TMP_DIR/outline-guard"
+mkdir -p "$guard_root/book/正文" "$guard_root/book/大纲" "$guard_root/book/设定" \
+         "$guard_root/short" "$guard_root/docs" \
+         "$guard_root/impbook/正文" "$guard_root/拆文库/impbook" \
+         "$guard_root/impshort" "$guard_root/拆文库/impshort"
+setup_git_repo "$guard_root"
+copy_hooks "$guard_root"
+assert_file "$guard_root/.claude/hooks/guard-outline-before-prose.sh"
+
+run_guard() {
+  # $1 = file_path ; prints the hook exit code (0 allow, 2 block)
+  local fp="$1" ec=0
+  printf '{"tool_name":"Write","tool_input":{"file_path":"%s","content":"x"}}' "$fp" \
+    | CLAUDE_PROJECT_DIR="$guard_root" bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
+  printf '%s' "$ec"
+}
+
+# 长篇授权流：缺细纲拦截 / 有细纲放行 / 章号补零容忍
+[ "$(run_guard 'book/正文/第1章_开端.md')" = "2" ] || fail "guard did not BLOCK long prose when 细纲 missing"
+: > "$guard_root/book/大纲/细纲_第1章.md"
+[ "$(run_guard 'book/正文/第1章_开端.md')" = "0" ] || fail "guard wrongly blocked long prose when 细纲 present"
+[ "$(run_guard 'book/正文/第001章_开端.md')" = "0" ] || fail "guard did not tolerate chapter-number zero padding (第001章 vs 细纲_第1章)"
+: > "$guard_root/book/大纲/细纲_第7章_惊变.md"
+[ "$(run_guard 'book/正文/第7章_x.md')" = "0" ] || fail "guard did not tolerate title-suffixed 细纲 (细纲_第7章_惊变.md)"
+# 短篇授权流：有 设定.md 信号 + 缺小节大纲 -> 拦截；补小节大纲 -> 放行
+: > "$guard_root/short/设定.md"
+[ "$(run_guard 'short/正文.md')" = "2" ] || fail "guard did not BLOCK short prose when 小节大纲.md missing"
+: > "$guard_root/short/小节大纲.md"
+[ "$(run_guard 'short/正文.md')" = "0" ] || fail "guard wrongly blocked short prose when 小节大纲.md present"
+# 非作品文件 / 无短篇工程信号 -> 放行（宁可漏拦不可误伤）
+[ "$(run_guard 'book/设定/角色.md')" = "0" ] || fail "guard wrongly blocked a non-prose file"
+[ "$(run_guard 'docs/正文.md')" = "0" ] || fail "guard wrongly blocked a non-story 正文.md (no 设定.md signal)"
+# 已存在正文 -> 放行（续写/改稿/去AI味）
+: > "$guard_root/book/正文/第9章_x.md"
+[ "$(run_guard 'book/正文/第9章_x.md')" = "0" ] || fail "guard wrongly blocked rewrite of an existing prose file"
+# story-import 迁移流：存在 拆文库/{书名}/ 源 -> 正文先于大纲/小节大纲迁移，放行
+[ "$(run_guard 'impbook/正文/第1章_x.md')" = "0" ] || fail "guard wrongly blocked story-import LONG prose migration (拆文库 source present)"
+: > "$guard_root/impshort/设定.md"
+[ "$(run_guard 'impshort/正文.md')" = "0" ] || fail "guard wrongly blocked story-import SHORT prose migration (拆文库 source present)"
+echo "  OK TS11 outline-before-prose guard"
+
+# TS12 — Agents-pending-restart one-shot confirmation
+restart_root="$TMP_DIR/restart-flag"
+mkdir -p "$restart_root/.claude"
+setup_git_repo "$restart_root"
+copy_hooks "$restart_root"
+copy_agent_refs "$restart_root"
+write_sentinel "$restart_root"
+touch "$restart_root/.claude/.agents-pending-restart"
+restart_out="$(run_from_nested "$restart_root" session-start.sh || true)"
+echo "$restart_out" | grep -q '现已注册可用' || fail "session-start did not confirm agents registered after restart flag"
+[ ! -f "$restart_root/.claude/.agents-pending-restart" ] || fail "session-start did not clear the one-shot .agents-pending-restart flag"
+echo "  OK TS12 restart-flag confirmation"
 
 echo ""
 echo "OK: story-setup deployment checks passed"
